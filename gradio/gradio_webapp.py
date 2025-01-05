@@ -4,9 +4,12 @@ from bson.objectid import ObjectId
 from datetime import datetime
 import hashlib
 import os
+from dotenv import load_dotenv
+import os
 
 # MongoDB setup
-MONGO_URI = "mongodb+srv://host:go2bc2CrPmnTpSh8@cluster0.65enq.mongodb.net/"
+load_dotenv()
+MONGO_URI = os.getenv("MONGO_URI")
 client = MongoClient(MONGO_URI)
 db = client.latent_fingerprint_app
 users_collection = db.users

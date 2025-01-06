@@ -76,6 +76,15 @@ def update_user_role(user_id, new_role):
     log_action(user["username"], f"Role updated to {new_role}")
     return "Role updated successfully."
 
+# Function to toggle user approval status
+def toggle_user_approval(user_id):
+    user = users_collection.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        return "User not found."
+    new_status = not user.get("approved", False)
+    users_collection.update_one({"_id": ObjectId(user_id)}, {"$set": {"approved": new_status}})
+    return f"User approval status changed to {'True' if new_status else 'False'}."
+
 # Gradio UI Components
 def render_ui(role, username):
     if role == "Police and Investigator":
@@ -172,6 +181,53 @@ def manage_users_ui():
         update_role_button.click(update_user_role, [user_id, role_dropdown], update_status)
     return ui
 
+# User Management UI
+def manage_users_ui2():
+    with gr.Blocks() as ui:
+        gr.Markdown("### User Management")
+        headers = ["Username", "Role", "Status"]
+        users = gr.Dataframe(get_users(), headers=headers, label="User Management")
+        refresh_button = gr.Button("Refresh Users")
+        refresh_button.click(lambda: get_users(), None, users)
+    return ui
+
+def manage_users_ui3():
+    with gr.Blocks() as ui:
+        gr.Markdown("### Manage Users Page")
+        
+        headers = ["ID", "Username", "Role", "Approved"]
+        users_list = gr.Dataframe(get_users(), headers=headers, label="Users List")
+        
+        role_dropdown = gr.Dropdown(roles, label="Change Role")
+        user_id = gr.Textbox(label="User ID")
+        update_role_button = gr.Button("Update Role")
+        update_status = gr.Textbox(label="Status")
+        update_role_button.click(update_user_role, [user_id, role_dropdown], update_status)
+        refresh_button = gr.Button("Refresh Users")
+        refresh_button.click(lambda: get_users(), None, users_list)
+    
+    return ui
+
+def manage_users_ui4():
+    with gr.Blocks() as ui:
+        gr.Markdown("### User Management")
+        headers = ["ID", "Username", "Role", "Approved"]
+        users = gr.Dataframe(get_users(), headers=headers, label="User Management")
+        
+        refresh_button = gr.Button("Refresh Users")
+        refresh_button.click(lambda: get_users(), None, users)
+
+        role_dropdown = gr.Dropdown(roles, label="Change Role")
+        user_id_input = gr.Textbox(label="User ID")
+        update_role_button = gr.Button("Update Role")
+        update_status = gr.Textbox(label="Status")
+        update_role_button.click(update_user_role, [user_id_input, role_dropdown], update_status)
+
+        toggle_approval_button = gr.Button("Toggle Approval Status")
+        toggle_status_output = gr.Textbox(label="Status")
+        toggle_approval_button.click(toggle_user_approval, [user_id_input], toggle_status_output)
+    return ui
+
 # Main App
 def main():
     user_session = {"username": None, "role": None, "logged_in": False}
@@ -221,13 +277,28 @@ def main():
 
                 login_button.click(login_handler, [username, password], output)
 
+            with gr.TabItem("Verification"):
+                verification_ui()
+
+            with gr.TabItem("Identification"):
+                identification_ui()
+
             with gr.TabItem("Log Management"):
                 log_management_ui()
 
             with gr.TabItem("User Management"):
                 manage_users_ui()
 
-    app.launch()
+            with gr.TabItem("User Management2"):
+                manage_users_ui2()
+
+            with gr.TabItem("User Management3"):
+                manage_users_ui3()
+
+            with gr.TabItem("User Management4"):
+                manage_users_ui4()
+
+    app.launch(share=True)
 
 if __name__ == "__main__":
     main()

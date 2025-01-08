@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Forensic Expertise</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <h1>Forensic Expertise Page</h1>
+    <table border="1">
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Date of Birth</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Contact Info</th>
+            <th>Blood Type</th>
+            <th>Fingerprints</th>
+        </tr>
+        {% for enrollment in enrollments %}
+        <tr>
+            <td>{{ enrollment.firstname }}</td>
+            <td>{{ enrollment.lastname }}</td>
+            <td>{{ enrollment.dob }}</td>
+            <td>{{ enrollment.age }}</td>
+            <td>{{ enrollment.gender }}</td>
+            <td>{{ enrollment.contact_info }}</td>
+            <td>{{ enrollment.blood_type }}</td>
+            <td>
+                {% for fingerprint in enrollment.fingerprints %}
+                    <h4>{{ fingerprint.finger_type }}</h4>
+                    {% for photo in fingerprint.photos %}
+                        <img src="{{ photo }}" alt="Fingerprint Photo" width="100"><br>
+                    {% endfor %}
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="{{ url_for('main_page') }}">Back to Main Page</a>
+</body>
+</html>

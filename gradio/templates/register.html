@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+</head>
+<body>
+    <h1>Register</h1>
+    <form method="POST">
+        <label>Username:</label>
+        <input type="text" name="username" required><br><br>
+        <label>Password:</label>
+        <input type="password" name="password" required><br><br>
+        <label>Role:</label>
+        <select name="role">
+            <option value="Police and Investigator">Police and Investigator</option>
+            <option value="Forensic Expertise">Forensic Expertise</option>
+            <option value="Citizen">Citizen</option>
+            <option value="Government Official">Government Official</option>
+        </select><br><br>
+        <label>Additional Info:</label>
+        <input type="text" name="additional_info"><br><br>
+        <button type="submit">Register</button>
+    </form>
+    <p>Already a member? <a href="{{ url_for('login') }}">Login</a></p>
+</body>
+</html>

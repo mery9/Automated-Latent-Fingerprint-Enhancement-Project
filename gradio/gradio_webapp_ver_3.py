@@ -169,46 +169,8 @@ def log_management_ui():
         refresh_button.click(lambda: get_logs(), None, logs)
     return ui
 
+
 def manage_users_ui():
-    with gr.Blocks() as ui:
-        gr.Markdown("### Manage Users Page")
-        headers = ["ID", "Username", "Role", "Approved"]
-        users_list = gr.Dataframe(get_users(), headers=headers, label="Users List")
-        role_dropdown = gr.Dropdown(roles, label="Change Role")
-        user_id = gr.Textbox(label="User ID")
-        update_role_button = gr.Button("Update Role")
-        update_status = gr.Textbox(label="Status")
-        update_role_button.click(update_user_role, [user_id, role_dropdown], update_status)
-    return ui
-
-# User Management UI
-def manage_users_ui2():
-    with gr.Blocks() as ui:
-        gr.Markdown("### User Management")
-        headers = ["Username", "Role", "Status"]
-        users = gr.Dataframe(get_users(), headers=headers, label="User Management")
-        refresh_button = gr.Button("Refresh Users")
-        refresh_button.click(lambda: get_users(), None, users)
-    return ui
-
-def manage_users_ui3():
-    with gr.Blocks() as ui:
-        gr.Markdown("### Manage Users Page")
-        
-        headers = ["ID", "Username", "Role", "Approved"]
-        users_list = gr.Dataframe(get_users(), headers=headers, label="Users List")
-        
-        role_dropdown = gr.Dropdown(roles, label="Change Role")
-        user_id = gr.Textbox(label="User ID")
-        update_role_button = gr.Button("Update Role")
-        update_status = gr.Textbox(label="Status")
-        update_role_button.click(update_user_role, [user_id, role_dropdown], update_status)
-        refresh_button = gr.Button("Refresh Users")
-        refresh_button.click(lambda: get_users(), None, users_list)
-    
-    return ui
-
-def manage_users_ui4():
     with gr.Blocks() as ui:
         gr.Markdown("### User Management")
         headers = ["ID", "Username", "Role", "Approved"]
@@ -248,57 +210,21 @@ def main():
         return "Access Granted"
 
     with gr.Blocks() as app:
-        with gr.Tabs():
-            with gr.TabItem("Register"):
-                username = gr.Textbox(label="Username")
-                password = gr.Textbox(label="Password", type="password")
-                role = gr.Dropdown(roles, label="Role")
-                additional_info = gr.Textbox(label="Additional Info (Optional)")
-                register_button = gr.Button("Register")
-                output = gr.Textbox(label="Status")
-                register_button.click(register_user, [username, password, role, additional_info], output)
 
-            with gr.TabItem("Login"):
-                username = gr.Textbox(label="Username")
-                password = gr.Textbox(label="Password", type="password")
-                login_button = gr.Button("Login")
-                output = gr.Textbox(label="Status")
+        with gr.TabItem("Verification"):
+            verification_ui()
 
-                def login_handler(username, password):
-                    result = login_user(username, password)
-                    if result["status"] == "success":
-                        user_session.update({
-                            "username": result["username"],
-                            "role": result["role"],
-                            "logged_in": True
-                        })
-                        return "Login successful. Welcome, {}.".format(result["username"])
-                    return result["message"]
+        with gr.TabItem("Identification"):
+            identification_ui()
 
-                login_button.click(login_handler, [username, password], output)
+        with gr.TabItem("Log Management"):
+            log_management_ui()
 
-            with gr.TabItem("Verification"):
-                verification_ui()
+        with gr.TabItem("User Management"):
+            manage_users_ui()
 
-            with gr.TabItem("Identification"):
-                identification_ui()
 
-            with gr.TabItem("Log Management"):
-                log_management_ui()
-
-            with gr.TabItem("User Management"):
-                manage_users_ui()
-
-            with gr.TabItem("User Management2"):
-                manage_users_ui2()
-
-            with gr.TabItem("User Management3"):
-                manage_users_ui3()
-
-            with gr.TabItem("User Management4"):
-                manage_users_ui4()
-
-    app.launch(share=True)
+    app.launch()
 
 if __name__ == "__main__":
     main()

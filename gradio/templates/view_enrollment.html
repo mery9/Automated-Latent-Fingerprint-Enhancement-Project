@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>View Enrollment</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h3, h4 {
+            color: #333;
+        }
+        p {
+            font-size: 16px;
+            color: #555;
+        }
+        img {
+            margin: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            width: 100px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .approve {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .disapprove {
+            background-color: #f44336;
+            color: white;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007BFF;
+        }
+    </style>
+</head>
+<body>
+    <h1>Enrollment Details for {{ enrollment.firstname }} {{ enrollment.lastname }}</h1>
+    <p>User ID: {{ enrollment.user_id }}</p>
+    <p>First Name: {{ enrollment.firstname }}</p>
+    <p>Last Name: {{ enrollment.lastname }}</p>
+    <p>Date of Birth: {{ enrollment.dob }}</p>
+    <p>Age: {{ enrollment.age }}</p>
+    <p>Gender: {{ enrollment.gender }}</p>
+    <p>Contact Info: {{ enrollment.contact_info }}</p>
+    <p>Blood Type: {{ enrollment.blood_type }}</p>
+    <h3>Fingerprints:</h3>
+    {% for fingerprint in enrollment.fingerprints %}
+        <h4>{{ fingerprint.finger_type }}</h4>
+        {% for photo_url in fingerprint.photos %}
+            <img src="{{ url_for('uploaded_file', filename=photo_url.split('/')[-1]) }}" alt="Fingerprint Photo">
+        {% endfor %}
+    {% endfor %}
+    <form method="POST">
+        <button type="submit" name="approve" class="approve">Approve</button>
+        <button type="submit" name="disapprove" class="disapprove">Disapprove</button>
+    </form>
+    <a href="{{ url_for('check_enrollment') }}">Back to Check Enrollment</a>
+</body>
+</html>

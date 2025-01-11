@@ -13,6 +13,9 @@
     {% if role in ["Citizen", "Police and Investigator"] %}
         <a href="{{ url_for('enrollment') }}">Go to Enrollment Page</a>
     {% endif %}
+    {% if role == "Police and Investigator" %}
+        <a href="{{ url_for('check_enrollment') }}">Check Enrollment Data</a>
+    {% endif %}
     {% if role == "Forensic Expertise" %}
         <a href="{{ url_for('forensic') }}">Go to Forensic Page</a>
     {% endif %}

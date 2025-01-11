@@ -8,6 +8,10 @@
 <body>
     <h1>Enrollment Form</h1>
     <form method="POST" enctype="multipart/form-data">
+        {% if role == "Police and Investigator" %}
+            <label>User ID:</label>
+            <input type="text" name="user_id" required><br><br>
+        {% endif %}
         <label>First Name:</label>
         <input type="text" name="firstname" required><br><br>
         <label>Last Name:</label>

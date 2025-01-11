@@ -1,0 +1,17 @@
+{
+  "name": "flask-tailwind-project",
+  "version": "1.0.0",
+  "description": "A Flask project integrated with Tailwind CSS",
+  "main": "app.py",
+  "scripts": {
+    "build:css": "postcss static/css/tailwind.css -o static/css/output.css"
+  },
+  "dependencies": {
+    "tailwindcss": "^2.2.19",
+    "postcss": "^8.4.6",
+    "autoprefixer": "^10.4.0"
+  },
+  "devDependencies": {},
+  "author": "",
+  "license": "ISC"
+}

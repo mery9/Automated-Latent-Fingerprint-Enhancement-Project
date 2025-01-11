@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>All Images</title>
+  </head>
+  <body>
+    <h1>All Uploaded Images</h1>
+    {% for image in images %}
+      <div>
+        <h2>{{ image.filename }}</h2>
+        <img src="data:image/jpeg;base64,{{ image.image }}" alt="{{ image.filename }}">
+      </div>
+    {% endfor %}
+    <a href="{{ url_for('index') }}">Back to Home</a>
+  </body>
+</html>

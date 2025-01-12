@@ -27,13 +27,45 @@
         <label>Blood Type:</label>
         <input type="text" name="blood_type" required><br><br>
         
-        {% for i in range(finger_names|length) %}
-            <h3>{{ finger_names[i] }}</h3>
-            <label>Finger Type:</label>
-            <input type="text" name="finger_type_{{ i }}" value="{{ finger_names[i] }}" readonly><br><br>
-            <label>Fingerprint Photos (optional):</label>
-            <input type="file" name="fingerprint_photos_{{ i }}" multiple><br><br>
-        {% endfor %}
+        <h3>Right Thumb</h3>
+        <label>Fingerprint Photo (optional):</label>
+        <input type="file" name="fingerprints_right_thumb"><br><br>
+        
+        <h3>Right Index</h3>
+        <label>Fingerprint Photo (optional):</label>
+        <input type="file" name="fingerprints_right_index"><br><br>
+        
+        <h3>Right Middle</h3>
+        <label>Fingerprint Photo (optional):</label>
+        <input type="file" name="fingerprints_right_middle"><br><br>
+        
+        <h3>Right Ring</h3>
+        <label>Fingerprint Photo (optional):</label>
+        <input type="file" name="fingerprints_right_ring"><br><br>
+        
+        <h3>Right Little</h3>
+        <label>Fingerprint Photo (optional):</label>
+        <input type="file" name="fingerprints_right_little"><br><br>
+        
+        <h3>Left Thumb</h3>
+        <label>Fingerprint Photo (optional):</label>
+        <input type="file" name="fingerprints_left_thumb"><br><br>
+        
+        <h3>Left Index</h3>
+        <label>Fingerprint Photo (optional):</label>
+        <input type="file" name="fingerprints_left_index"><br><br>
+        
+        <h3>Left Middle</h3>
+        <label>Fingerprint Photo (optional):</label>
+        <input type="file" name="fingerprints_left_middle"><br><br>
+        
+        <h3>Left Ring</h3>
+        <label>Fingerprint Photo (optional):</label>
+        <input type="file" name="fingerprints_left_ring"><br><br>
+        
+        <h3>Left Little</h3>
+        <label>Fingerprint Photo (optional):</label>
+        <input type="file" name="fingerprints_left_little"><br><br>
         
         <button type="submit">Submit</button>
     </form>

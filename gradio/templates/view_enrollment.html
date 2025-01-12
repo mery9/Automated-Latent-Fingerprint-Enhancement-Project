@@ -21,7 +21,7 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             padding: 5px;
-            width: 100px;
+            width: 500px;
         }
         button {
             padding: 10px 20px;
@@ -56,13 +56,37 @@
     <p>Gender: {{ enrollment.gender }}</p>
     <p>Contact Info: {{ enrollment.contact_info }}</p>
     <p>Blood Type: {{ enrollment.blood_type }}</p>
-    <h3>Fingerprints:</h3>
-    {% for fingerprint in enrollment.fingerprints %}
-        <h4>{{ fingerprint.finger_type }}</h4>
-        {% for photo_url in fingerprint.photos %}
-            <img src="{{ url_for('uploaded_file', filename=photo_url.split('/')[-1]) }}" alt="Fingerprint Photo">
-        {% endfor %}
-    {% endfor %}
+    
+    <h3>Right Thumb</h3>
+    <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_right_thumb }}" alt="Right Thumb Fingerprint Photo">
+    
+    <h3>Right Index</h3>
+    <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_right_index }}" alt="Right Index Fingerprint Photo">
+    
+    <h3>Right Middle</h3>
+    <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_right_middle }}" alt="Right Middle Fingerprint Photo">
+    
+    <h3>Right Ring</h3>
+    <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_right_ring }}" alt="Right Ring Fingerprint Photo">
+    
+    <h3>Right Little</h3>
+    <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_right_little }}" alt="Right Little Fingerprint Photo">
+    
+    <h3>Left Thumb</h3>
+    <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_left_thumb }}" alt="Left Thumb Fingerprint Photo">
+    
+    <h3>Left Index</h3>
+    <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_left_index }}" alt="Left Index Fingerprint Photo">
+    
+    <h3>Left Middle</h3>
+    <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_left_middle }}" alt="Left Middle Fingerprint Photo">
+    
+    <h3>Left Ring</h3>
+    <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_left_ring }}" alt="Left Ring Fingerprint Photo">
+    
+    <h3>Left Little</h3>
+    <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_left_little }}" alt="Left Little Fingerprint Photo">
+    
     <form method="POST">
         <button type="submit" name="approve" class="approve">Approve</button>
         <button type="submit" name="disapprove" class="disapprove">Disapprove</button>

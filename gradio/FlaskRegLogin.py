@@ -5,6 +5,9 @@ import datetime
 from dotenv import load_dotenv
 import os
 from werkzeug.utils import secure_filename
+from io import BytesIO
+from PIL import Image
+import base64
 
 # Load environment variables
 load_dotenv()
@@ -16,6 +19,7 @@ db = client.latent_fingerprint
 users_collection = db.users
 enrollments_collection = db.enrollments
 logs_collection = db.logs
+images_collection = db.images
 
 # Flask app setup
 app = Flask(__name__)
@@ -34,20 +38,22 @@ def log_action(user, action):
         "timestamp": datetime.datetime.now()
     })
 
-# Function to save uploaded photos
-def save_photos(user_id, finger_type, photos):
-    photo_urls = []
-    for i, photo in enumerate(photos):
-        if len(photo_urls) < 5:
-            # Create a unique filename
-            filename = secure_filename(f"{user_id}_{finger_type}_{i+1}.jpg")
-            # Ensure the directory exists
-            photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            os.makedirs(os.path.dirname(photo_path), exist_ok=True)
-            # Save the photo to the 'static/uploads' directory
-            photo.save(photo_path)
-            photo_urls.append(url_for('uploaded_file', filename=filename))
-    return photo_urls
+# Function to save uploaded photo
+def save_photo(user_id, finger_type, photo):
+    # Create a unique filename
+    filename = secure_filename(f"{user_id}_{finger_type}.jpg")
+    # Ensure the directory exists
+    photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    os.makedirs(os.path.dirname(photo_path), exist_ok=True)
+    # Save the photo to the 'static/uploads' directory
+    photo.save(photo_path)
+    
+    # Convert image to base64
+    with open(photo_path, 'rb') as f:
+        img_data = f.read()
+        img_base64 = base64.b64encode(img_data).decode('utf-8')
+    
+    return img_base64
 
 # Route: Home
 @app.route("/")
@@ -120,11 +126,6 @@ def enrollment():
     if "username" not in session or session["role"] not in ["Citizen", "Police and Investigator"]:
         return redirect(url_for("login"))
 
-    finger_names = [
-        "Right Thumb", "Right Index", "Right Middle", "Right Ring", "Right Little",
-        "Left Thumb", "Left Index", "Left Middle", "Left Ring", "Left Little"
-    ]
-
     if request.method == "POST":
         data = request.form
         firstname = data.get("firstname")
@@ -135,20 +136,32 @@ def enrollment():
         contact_info = data.get("contact_info")
         blood_type = data.get("blood_type")
         user_id = session["user_id"] if session["role"] == "Citizen" else data.get("user_id")
-        fingerprints = []
-
-        for i, finger_name in enumerate(finger_names):
-            finger_type = finger_name.replace(" ", "_")
-            photos = request.files.getlist(f"fingerprint_photos_{i}")
-            photo_urls = save_photos(user_id, finger_type, photos)
-            fingerprints.append({
-                "finger_type": finger_type,
-                "photos": photo_urls
-            })
-
+        
         # Check if the user already has enrollment data
-        if enrollments_collection.find_one({"user_id": user_id}):
-            return render_template("error.html", message="User already enrolled.", back_url=url_for("enrollment"))
+        if session["role"] == "Citizen" and enrollments_collection.find_one({"user_id": user_id}):
+            return render_template("error.html", message="You have already enrolled.", back_url=url_for("main_page"))
+
+        fingerprints = {}
+        if "fingerprints_right_thumb" in request.files:
+            fingerprints["fingerprints_right_thumb"] = save_photo(user_id, "Right_Thumb", request.files["fingerprints_right_thumb"])
+        if "fingerprints_right_index" in request.files:
+            fingerprints["fingerprints_right_index"] = save_photo(user_id, "Right_Index", request.files["fingerprints_right_index"])
+        if "fingerprints_right_middle" in request.files:
+            fingerprints["fingerprints_right_middle"] = save_photo(user_id, "Right_Middle", request.files["fingerprints_right_middle"])
+        if "fingerprints_right_ring" in request.files:
+            fingerprints["fingerprints_right_ring"] = save_photo(user_id, "Right_Ring", request.files["fingerprints_right_ring"])
+        if "fingerprints_right_little" in request.files:
+            fingerprints["fingerprints_right_little"] = save_photo(user_id, "Right_Little", request.files["fingerprints_right_little"])
+        if "fingerprints_left_thumb" in request.files:
+            fingerprints["fingerprints_left_thumb"] = save_photo(user_id, "Left_Thumb", request.files["fingerprints_left_thumb"])
+        if "fingerprints_left_index" in request.files:
+            fingerprints["fingerprints_left_index"] = save_photo(user_id, "Left_Index", request.files["fingerprints_left_index"])
+        if "fingerprints_left_middle" in request.files:
+            fingerprints["fingerprints_left_middle"] = save_photo(user_id, "Left_Middle", request.files["fingerprints_left_middle"])
+        if "fingerprints_left_ring" in request.files:
+            fingerprints["fingerprints_left_ring"] = save_photo(user_id, "Left_Ring", request.files["fingerprints_left_ring"])
+        if "fingerprints_left_little" in request.files:
+            fingerprints["fingerprints_left_little"] = save_photo(user_id, "Left_Little", request.files["fingerprints_left_little"])
 
         enrollment_data = {
             "user_id": user_id,
@@ -159,7 +172,7 @@ def enrollment():
             "gender": gender,
             "contact_info": contact_info,
             "blood_type": blood_type,
-            "fingerprints": fingerprints,
+            **fingerprints,
             "approved": False if session["role"] == "Citizen" else True
         }
 
@@ -167,7 +180,7 @@ def enrollment():
         log_action(session["username"], "Completed enrollment")
         return render_template("success.html", message="Enrollment successful! Awaiting approval." if session["role"] == "Citizen" else "Enrollment successful!", back_url=url_for("main_page"))
 
-    return render_template("enrollment.html", finger_names=finger_names, role=session["role"])  # A form for enrollment.
+    return render_template("enrollment.html", role=session["role"])  # A form for enrollment.
 
 # Route: Check and Update Enrollment
 @app.route("/check_enrollment", methods=["GET", "POST"])
@@ -208,23 +221,6 @@ def forensic():
 
     enrollments = enrollments_collection.find()
     return render_template("forensic.html", enrollments=enrollments)
-
-# Route: Upload Image
-@app.route("/upload_image", methods=["POST"])
-def upload_image():
-    if "file" not in request.files:
-        return "No file part"
-    file = request.files["file"]
-    if file.filename == "":
-        return "No selected file"
-    if file:
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return redirect(url_for('uploaded_file', filename=filename))
-
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 # Route: Logout
 @app.route("/logout")

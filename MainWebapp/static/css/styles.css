@@ -1,0 +1,251 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+body {
+    @apply bg-gray-100 p-4 md:p-8;
+}
+
+.container {
+    @apply max-w-5xl mx-auto bg-white p-6 md:p-10 rounded-lg shadow-md;
+}
+
+h1 {
+    @apply text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800;
+}
+
+p {
+    @apply mb-2 md:mb-4 text-gray-600;
+}
+
+a {
+    @apply text-blue-500 mt-2 md:mt-4 inline-block;
+}
+
+a:hover {
+    @apply text-blue-700;
+}
+
+button {
+    @apply bg-blue-500 text-white p-2 rounded mt-2 md:mt-4;
+}
+
+button:hover {
+    @apply bg-blue-700;
+}
+
+.card {
+    @apply bg-white p-4 md:p-6 rounded-lg shadow-md mb-4;
+}
+
+.card-header {
+    @apply text-lg md:text-xl font-semibold mb-2 text-gray-800;
+}
+
+.card-body {
+    @apply text-gray-600;
+}
+
+.card-footer {
+    @apply mt-4;
+}
+
+.footer {
+    @apply text-center text-gray-500 mt-8;
+}
+
+/* Login and Register styles */
+.form-container {
+    @apply max-w-md mx-auto bg-white p-6 rounded-lg shadow-md;
+}
+
+.form-group {
+    @apply mb-4;
+}
+
+.form-label {
+    @apply block mb-2 font-semibold text-gray-700;
+}
+
+.form-input {
+    @apply border p-2 w-full rounded;
+}
+
+.form-button {
+    @apply bg-blue-500 text-white p-2 rounded w-full;
+}
+
+.form-button:hover {
+    @apply bg-blue-700;
+}
+
+.form-link {
+    @apply text-blue-500 mt-4 inline-block;
+}
+
+.form-link:hover {
+    @apply text-blue-700;
+}
+
+/* Home page styles */
+.home-container {
+    @apply max-w-4xl mx-auto bg-white p-4 md:p-8 rounded-lg shadow-md text-center;
+}
+
+.home-header {
+    @apply text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800;
+}
+
+.home-link {
+    @apply text-blue-500 mt-2 md:mt-4 inline-block;
+}
+
+.home-link:hover {
+    @apply text-blue-700;
+}
+
+/* Check Enrollment styles */
+.enrollment-container {
+    @apply max-w-4xl mx-auto bg-white p-4 md:p-8 rounded-lg shadow-md;
+}
+
+.enrollment-header {
+    @apply text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800;
+}
+
+.enrollment-list {
+    @apply list-disc list-inside;
+}
+
+.enrollment-item {
+    @apply mb-2;
+}
+
+.enrollment-link {
+    @apply text-blue-500;
+}
+
+.enrollment-link:hover {
+    @apply text-blue-700;
+}
+
+/* Enrollment styles */
+.enrollment-form-container {
+    @apply max-w-4xl mx-auto bg-white p-4 md:p-8 rounded-lg shadow-md;
+}
+
+.enrollment-form-header {
+    @apply text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800;
+}
+
+.enrollment-form-group {
+    @apply mb-4;
+}
+
+.enrollment-form-label {
+    @apply block mb-2 font-semibold text-gray-700;
+}
+
+.enrollment-form-input {
+    @apply border p-2 w-full rounded;
+}
+
+.enrollment-form-button {
+    @apply bg-blue-500 text-white p-2 rounded w-full;
+}
+
+.enrollment-form-button:hover {
+    @apply bg-blue-700;
+}
+
+.enrollment-form-link {
+    @apply text-blue-500 mt-4 inline-block;
+}
+
+.enrollment-form-link:hover {
+    @apply text-blue-700;
+}
+
+/* Error and Success styles */
+.message-container {
+    @apply max-w-4xl mx-auto bg-white p-4 md:p-8 rounded-lg shadow-md text-center;
+}
+
+.message-header {
+    @apply text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-red-600;
+}
+
+.message-body {
+    @apply text-gray-600 mb-4;
+}
+
+.message-link {
+    @apply text-blue-500 mt-4 inline-block;
+}
+
+.message-link:hover {
+    @apply text-blue-700;
+}
+
+.success {
+    color: green;
+}
+
+/* View Enrollment styles */
+.view-enrollment-container {
+    @apply max-w-4xl mx-auto bg-white p-4 md:p-8 rounded-lg shadow-md;
+}
+
+.view-enrollment-header {
+    @apply text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800;
+}
+
+.view-enrollment-body {
+    @apply text-gray-600 mb-4;
+}
+
+.view-enrollment-img {
+    @apply m-2 border border-gray-300 rounded p-2 w-60 md:w-72;
+}
+
+.view-enrollment-button {
+    @apply bg-green-500 text-white p-2 rounded mt-2 md:mt-4;
+}
+
+.view-enrollment-button:hover {
+    @apply bg-green-700;
+}
+
+.view-enrollment-button-disapprove {
+    @apply bg-red-500 text-white p-2 rounded mt-2 md:mt-4;
+}
+
+.view-enrollment-button-disapprove:hover {
+    @apply bg-red-700;
+}
+
+/* Button styles */
+.button {
+    @apply bg-blue-500 text-white p-2 rounded mt-2 md:mt-4 inline-block text-center;
+}
+
+.button:hover {
+    @apply bg-blue-700;
+}
+
+.table-auto {
+    @apply w-full text-center;
+}
+
+.table-auto th, .table-auto td {
+    @apply border px-4 py-2 whitespace-nowrap;
+}
+
+.form-select {
+    @apply border p-2 rounded;
+}
+
+.overflow-x-auto {
+    @apply overflow-x-auto;
+}

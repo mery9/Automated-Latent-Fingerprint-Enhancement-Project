@@ -1,0 +1,13 @@
+{
+  "name": "mainwebapp",
+  "version": "1.0.0",
+  "description": "Main Web Application",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "tailwindcss build D:/Work/Project/WebApp/MainWebapp/static/css/styles.css -o D:/Work/Project/WebApp/MainWebapp/static/css/tailwind.css",
+    "watch:css": "tailwindcss build D:/Work/Project/WebApp/MainWebapp/static/css/styles.css -o D:/Work/Project/WebApp/MainWebapp/static/css/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}

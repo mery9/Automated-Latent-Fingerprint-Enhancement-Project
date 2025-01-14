@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Enrollment</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-4 md:p-8">
+    <div class="enrollment-form-container">
+        <h1 class="enrollment-form-header">Enrollment Form</h1>
+        <form method="POST" enctype="multipart/form-data">
+            {% if role == "Police and Investigator" %}
+                <div class="enrollment-form-group">
+                    <label class="enrollment-form-label">User ID:</label>
+                    <input type="text" name="user_id" required class="enrollment-form-input">
+                </div>
+            {% endif %}
+            <div class="enrollment-form-group">
+                <label class="enrollment-form-label">First Name:</label>
+                <input type="text" name="firstname" required class="enrollment-form-input">
+            </div>
+            <div class="enrollment-form-group">
+                <label class="enrollment-form-label">Last Name:</label>
+                <input type="text" name="lastname" required class="enrollment-form-input">
+            </div>
+            <div class="enrollment-form-group">
+                <label class="enrollment-form-label">Date of Birth:</label>
+                <input type="date" name="dob" required class="enrollment-form-input">
+            </div>
+            <div class="enrollment-form-group">
+                <label class="enrollment-form-label">Age:</label>
+                <input type="number" name="age" required class="enrollment-form-input">
+            </div>
+            <div class="enrollment-form-group">
+                <label class="enrollment-form-label">Gender:</label>
+                <input type="text" name="gender" required class="enrollment-form-input">
+            </div>
+            <div class="enrollment-form-group">
+                <label class="enrollment-form-label">Contact Info:</label>
+                <input type="text" name="contact_info" required class="enrollment-form-input">
+            </div>
+            <div class="enrollment-form-group">
+                <label class="enrollment-form-label">Blood Type:</label>
+                <input type="text" name="blood_type" required class="enrollment-form-input">
+            </div>
+            
+            <div class="enrollment-form-group">
+                <label class="enrollment-form-label">Right Thumb:</label>
+                <input type="file" name="fingerprints_right_thumb" class="enrollment-form-input">
+            </div>
+            <div class="enrollment-form-group">
+                <label class="enrollment-form-label">Right Index:</label>
+                <input type="file" name="fingerprints_right_index" class="enrollment-form-input">
+            </div>
+            <div class="enrollment-form-group">
+                <label class="enrollment-form-label">Right Middle:</label>
+                <input type="file" name="fingerprints_right_middle" class="enrollment-form-input">
+            </div>
+            <div class="enrollment-form-group">
+                <label class="enrollment-form-label">Right Ring:</label>
+                <input type="file" name="fingerprints_right_ring" class="enrollment-form-input">
+            </div>
+            <div class="enrollment-form-group">
+                <label class="enrollment-form-label">Right Little:</label>
+                <input type="file" name="fingerprints_right_little" class="enrollment-form-input">
+            </div>
+            <div class="enrollment-form-group">
+                <label class="enrollment-form-label">Left Thumb:</label>
+                <input type="file" name="fingerprints_left_thumb" class="enrollment-form-input">
+            </div>
+            <div class="enrollment-form-group">
+                <label class="enrollment-form-label">Left Index:</label>
+                <input type="file" name="fingerprints_left_index" class="enrollment-form-input">
+            </div>
+            <div class="enrollment-form-group">
+                <label class="enrollment-form-label">Left Middle:</label>
+                <input type="file" name="fingerprints_left_middle" class="enrollment-form-input">
+            </div>
+            <div class="enrollment-form-group">
+                <label class="enrollment-form-label">Left Ring:</label>
+                <input type="file" name="fingerprints_left_ring" class="enrollment-form-input">
+            </div>
+            <div class="enrollment-form-group">
+                <label class="enrollment-form-label">Left Little:</label>
+                <input type="file" name="fingerprints_left_little" class="enrollment-form-input">
+            </div>
+            
+            <button type="submit" class="enrollment-form-button">Submit</button>
+        </form>
+        <a href="{{ url_for('main_page') }}" class="enrollment-form-link">Back to Main Page</a>
+    </div>
+</body>
+</html>

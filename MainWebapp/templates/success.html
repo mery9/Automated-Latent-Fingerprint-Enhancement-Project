@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success</title>
+    <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-4 md:p-8">
+    <div class="message-container">
+        <h1 class="message-header">Success</h1>
+        <p class="message-body">{{ message }}</p>
+        <a href="{{ back_url }}" class="message-link">Go Back</a>
+    </div>
+</body>
+</html>

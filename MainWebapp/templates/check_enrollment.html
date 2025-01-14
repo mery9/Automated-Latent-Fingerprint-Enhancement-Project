@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Check Enrollment</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-4 md:p-8">
+    <div class="enrollment-container">
+        <h1 class="enrollment-header">Check Enrollment Data</h1>
+        <ul class="enrollment-list">
+            {% for enrollment in enrollments %}
+                <li class="enrollment-item">
+                    <a href="{{ url_for('view_enrollment', user_id=enrollment.user_id) }}" class="enrollment-link">{{ enrollment.user_id }} - {{ enrollment.firstname }} {{ enrollment.lastname }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('main_page') }}" class="text-blue-500 mt-4 inline-block">Back to Main Page</a>
+    </div>
+</body>
+</html>

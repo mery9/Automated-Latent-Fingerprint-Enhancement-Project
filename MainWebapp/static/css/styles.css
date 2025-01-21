@@ -38,11 +38,11 @@ a:hover {
 }
 
 .logout-button {
-    @apply bg-red-500 text-white py-2 px-4 rounded text-center;
+    @apply bg-red-500;
 }
 
 .logout-button:hover {
-    @apply bg-red-600 text-white;
+    @apply bg-red-700;
 }
 
 .card {
@@ -98,7 +98,32 @@ a:hover {
     @apply text-blue-700;
 }
 
-/* Enrollment styles */
+/* Home page styles */
+.home-container {
+    @apply max-w-4xl mx-auto bg-white p-4 md:p-8 rounded-lg shadow-md text-center;
+}
+
+.home-header {
+    @apply text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800;
+}
+
+.home-link {
+    @apply text-blue-500 mt-2 md:mt-4 inline-block;
+}
+
+.home-link:hover {
+    @apply text-blue-700;
+}
+
+/* Check Enrollment styles */
+.enrollment-container {
+    @apply max-w-4xl mx-auto bg-white p-4 md:p-8 rounded-lg shadow-md;
+}
+
+.enrollment-header {
+    @apply text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800;
+}
+
 .enrollment-list {
     @apply list-disc list-inside;
 }
@@ -115,7 +140,73 @@ a:hover {
     @apply text-blue-700;
 }
 
+/* Enrollment styles */
+.enrollment-form-container {
+    @apply max-w-4xl mx-auto bg-white p-4 md:p-8 rounded-lg shadow-md;
+}
+
+.enrollment-form-header {
+    @apply text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800;
+}
+
+.enrollment-form-group {
+    @apply mb-4;
+}
+
+.enrollment-form-label {
+    @apply block mb-2 font-semibold text-gray-700;
+}
+
+.enrollment-form-input {
+    @apply border p-2 w-full rounded;
+}
+
+.enrollment-form-button {
+    @apply bg-blue-500 text-white p-2 rounded w-full;
+}
+
+.enrollment-form-button:hover {
+    @apply bg-blue-700;
+}
+
+.enrollment-form-link {
+    @apply text-blue-500 mt-4 inline-block;
+}
+
+.enrollment-form-link:hover {
+    @apply text-blue-700;
+}
+
+/* Error and Success styles */
+.message-container {
+    @apply max-w-4xl mx-auto bg-white p-4 md:p-8 rounded-lg shadow-md text-center;
+}
+
+.message-header {
+    @apply text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-red-600;
+}
+
+.message-body {
+    @apply text-gray-600 mb-4;
+}
+
+.message-link {
+    @apply text-blue-500 mt-4 inline-block;
+}
+
+.message-link:hover {
+    @apply text-blue-700;
+}
+
 /* View Enrollment styles */
+.view-enrollment-container {
+    @apply max-w-4xl mx-auto bg-white p-4 md:p-8 rounded-lg shadow-md;
+}
+
+.view-enrollment-header {
+    @apply text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800;
+}
+
 .view-enrollment-body {
     @apply text-gray-600 mb-4;
 }
@@ -140,23 +231,6 @@ a:hover {
     @apply bg-red-700;
 }
 
-/* Error and Success styles */
-.message-body {
-    @apply text-gray-600 mb-4;
-}
-
-.message-link {
-    @apply text-blue-500 mt-4 inline-block;
-}
-
-.message-link:hover {
-    @apply text-blue-700;
-}
-
-.success {
-    color: green;
-}
-
 /* Button styles */
 .button {
     @apply bg-blue-500 text-white p-2 rounded mt-2 md:mt-4 inline-block text-center;
@@ -167,13 +241,44 @@ a:hover {
 }
 
 .table-auto {
-    @apply w-full mb-4;
+    @apply w-full mb-4 text-center;
 }
 
 .table-auto th, .table-auto td {
-    @apply border px-4 py-2;
+    @apply border px-4 py-2 text-center;
 }
 
 .form-select {
-    @apply border p-2 rounded;
+    @apply border p-2 rounded justify-center;
+}
+
+/* Responsive table styles */
+.responsive-table {
+    @apply w-full overflow-x-auto;
+}
+
+.responsive-table table {
+    @apply w-full min-w-full;
+}
+
+.responsive-table th, .responsive-table td {
+    @apply border px-4 py-2;
+}
+
+.responsive-table tr:nth-child(even) {
+    @apply bg-gray-100;
+}
+
+.responsive-table tr:nth-child(odd) {
+    @apply bg-white;
+}
+
+@media (max-width: 768px) {
+    .responsive-table th, .responsive-table td {
+        @apply block w-full;
+    }
+
+    .responsive-table tr {
+        @apply mb-4;
+    }
 }

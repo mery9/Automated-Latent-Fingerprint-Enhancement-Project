@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
 </head>
-<body class="bg-gray-100 p-4 md:p-8">
-    <div class="container centered-container">
+<body class="bg-gray-100">
+    <div class="container">
         <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800">Manage Users</h1>
         <div class="responsive-table">
-            <table class="table-auto w-full mb-4">
+            <table class="table-auto w-full mb-4 hidden md:table">
                 <thead>
                     <tr>
                         <th class="px-4 py-2">User ID</th>
@@ -22,7 +22,7 @@
                 </thead>
                 <tbody>
                     {% for user in users %}
-                    <tr style="background-color: {% if loop.index is even %}#f7fafc{% else %}#ffffff{% endif %};">
+                    <tr class="{% if loop.index is even %}bg-gray-100{% else %}bg-white{% endif %}">
                         <td class="border px-4 py-2">{{ user._id }}</td>
                         <td class="border px-4 py-2">{{ user.username }}</td>
                         <td class="border px-4 py-2">{{ user.role }}</td>
@@ -47,6 +47,32 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <div class="block md:hidden">
+                {% for user in users %}
+                <div class="border mb-4 p-4 rounded-lg shadow-md bg-white">
+                    <p><strong>User ID:</strong> {{ user._id }}</p>
+                    <p><strong>Username:</strong> {{ user.username }}</p>
+                    <p><strong>Role:</strong> {{ user.role }}</p>
+                    <p><strong>Approved:</strong> {{ user.approved }}</p>
+                    <div class="mt-2">
+                        <form method="POST" class="inline-block">
+                            <input type="hidden" name="user_id" value="{{ user._id }}">
+                            <select name="new_role" class="form-select">
+                                <option value="Citizen" {% if user.role == "Citizen" %}selected{% endif %}>Citizen</option>
+                                <option value="Police and Investigator" {% if user.role == "Police and Investigator" %}selected{% endif %}>Police and Investigator</option>
+                                <option value="Forensic Expertise" {% if user.role == "Forensic Expertise" %}selected{% endif %}>Forensic Expertise</option>
+                                <option value="Government Official" {% if user.role == "Government Official" %}selected{% endif %}>Government Official</option>
+                            </select>
+                            <select name="new_approval_status" class="form-select">
+                                <option value="true" {% if user.approved %}selected{% endif %}>True</option>
+                                <option value="false" {% if not user.approved %}selected{% endif %}>False</option>
+                            </select>
+                            <button type="submit" class="button">Update</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
         <a href="{{ url_for('main_page') }}" class="button">Back to Main Page</a>
     </div>

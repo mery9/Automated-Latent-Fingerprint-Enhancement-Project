@@ -6,34 +6,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
 </head>
-<body class="bg-gray-100 p-4 md:p-8">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
     <div class="form-container">
         <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800">Register</h1>
         <form method="POST">
             <div class="form-group">
-                <label class="form-label">Username:</label>
-                <input type="text" name="username" required class="form-input">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" id="username" name="username" class="form-input" required>
             </div>
             <div class="form-group">
-                <label class="form-label">Password:</label>
-                <input type="password" name="password" required class="form-input">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" name="password" class="form-input" required>
             </div>
             <div class="form-group">
-                <label class="form-label">Role:</label>
-                <select name="role" class="form-input">
+                <label for="role" class="form-label">Role</label>
+                <select id="role" name="role" class="form-input" required>
+                    <option value="Citizen">Citizen</option>
                     <option value="Police and Investigator">Police and Investigator</option>
                     <option value="Forensic Expertise">Forensic Expertise</option>
-                    <option value="Citizen">Citizen</option>
                     <option value="Government Official">Government Official</option>
                 </select>
             </div>
             <div class="form-group">
-                <label class="form-label">Additional Info:</label>
-                <input type="text" name="additional_info" class="form-input">
+                <label for="additional_info" class="form-label">Additional Info</label>
+                <textarea id="additional_info" name="additional_info" class="form-input"></textarea>
             </div>
             <button type="submit" class="form-button">Register</button>
         </form>
-        <p class="mt-4 text-center">Already a member? <a href="{{ url_for('login') }}" class="form-link">Login</a></p>
+        <a href="{{ url_for('login') }}" class="form-link">Already have an account? Login</a>
     </div>
 </body>
 </html>

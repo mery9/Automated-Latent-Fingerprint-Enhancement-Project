@@ -6,10 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
 </head>
-<body class="bg-gray-100 p-4 md:p-8">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
     <div class="home-container">
         <h1 class="home-header">Welcome to the Latent Fingerprint System</h1>
-        <a href="{{ url_for('register') }}" class="home-link">Register</a> | <a href="{{ url_for('login') }}" class="home-link">Login</a>
+        <div class="flex flex-col items-center space-y-4">
+            <a href="{{ url_for('register') }}" class="button">Register</a>
+            <a href="{{ url_for('login') }}" class="button">Login</a>
+        </div>
     </div>
 </body>
 </html>

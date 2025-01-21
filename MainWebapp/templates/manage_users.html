@@ -5,14 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/manage_users_view_logs.css') }}" rel="stylesheet">
 </head>
 <body class="bg-gray-100 p-4 md:p-8">
-    <div class="container mx-auto">
+    <div class="container centered-container">
         <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800">Manage Users</h1>
-        <div class="overflow-x-auto">
-            <table class="table-auto w-full mx-auto text-center">
+        <div class="responsive-table">
+            <table class="table-auto w-full mb-4">
                 <thead>
                     <tr>
+                        <th class="px-4 py-2">User ID</th>
                         <th class="px-4 py-2">Username</th>
                         <th class="px-4 py-2">Role</th>
                         <th class="px-4 py-2">Approved</th>
@@ -21,12 +23,13 @@
                 </thead>
                 <tbody>
                     {% for user in users %}
-                    <tr>
+                    <tr style="background-color: {% if loop.index is even %}#f7fafc{% else %}#ffffff{% endif %};">
+                        <td class="border px-4 py-2">{{ user._id }}</td>
                         <td class="border px-4 py-2">{{ user.username }}</td>
                         <td class="border px-4 py-2">{{ user.role }}</td>
                         <td class="border px-4 py-2">{{ user.approved }}</td>
                         <td class="border px-4 py-2">
-                            <form method="POST" class="inline">
+                            <form method="POST" class="inline-block">
                                 <input type="hidden" name="user_id" value="{{ user._id }}">
                                 <select name="new_role" class="form-select">
                                     <option value="Citizen" {% if user.role == "Citizen" %}selected{% endif %}>Citizen</option>
@@ -46,9 +49,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="text-center mt-4">
-            <a href="{{ url_for('main_page') }}" class="button">Back to Main Page</a>
-        </div>
+        <a href="{{ url_for('main_page') }}" class="button">Back to Main Page</a>
     </div>
 </body>
 </html>

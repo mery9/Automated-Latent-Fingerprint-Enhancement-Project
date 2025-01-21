@@ -58,7 +58,7 @@ def save_photo(user_id, finger_type, photo):
 # Route: Home
 @app.route("/")
 def home():
-    return render_template("home.html")  # A simple HTML page with "Register" and "Login" links.
+    return redirect(url_for("login"))
 
 # Route: Register
 @app.route("/register", methods=["GET", "POST"])
@@ -222,15 +222,6 @@ def forensic():
     enrollments = enrollments_collection.find()
     return render_template("forensic.html", enrollments=enrollments)
 
-# Route: View Logs
-@app.route("/view_logs")
-def view_logs():
-    if "username" not in session or session["role"] != "Government Official":
-        return redirect(url_for("login"))
-
-    logs = logs_collection.find()
-    return render_template("view_logs.html", logs=logs)
-
 # Route: Manage Users
 @app.route("/manage_users", methods=["GET", "POST"])
 def manage_users():
@@ -245,8 +236,42 @@ def manage_users():
         users_collection.update_one({"_id": ObjectId(user_id)}, {"$set": {"role": new_role, "approved": new_approval_status}})
         log_action(session["username"], f"Updated user {user_id} role to {new_role} and approval status to {new_approval_status}")
 
-    users = users_collection.find()
+    users = list(users_collection.find())
     return render_template("manage_users.html", users=users)
+
+# Route: View Logs
+@app.route("/view_logs", methods=["GET", "POST"])
+def view_logs():
+    if "username" not in session or session["role"] != "Government Official":
+        return redirect(url_for("login"))
+
+    page = int(request.args.get("page", 1))
+    per_page = 25
+    search_query = request.form.get("search", "")
+    
+    query = {}
+    if search_query:
+        try:
+            object_id = ObjectId(search_query)
+            query["_id"] = object_id
+        except:
+            query = {
+                "$or": [
+                    {"user": {"$regex": search_query, "$options": "i"}},
+                    {"action": {"$regex": search_query, "$options": "i"}},
+                    {"timestamp": {"$regex": search_query, "$options": "i"}}
+                ]
+            }
+    
+    total_logs = logs_collection.count_documents(query)
+    total_pages = (total_logs + per_page - 1) // per_page
+    logs = list(logs_collection.find(query).skip((page - 1) * per_page).limit(per_page))
+    
+    # Format the timestamp correctly
+    for log in logs:
+        log["timestamp"] = log["timestamp"].strftime("%Y-%m-%dT%H:%M:%S")
+    
+    return render_template("view_logs.html", logs=logs, page=page, total_pages=total_pages, search_query=search_query)
 
 # Route: Logout
 @app.route("/logout")

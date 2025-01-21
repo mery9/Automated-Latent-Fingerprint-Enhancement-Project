@@ -8,7 +8,7 @@ body {
 }
 
 .container {
-    @apply max-w-5xl mx-auto bg-white p-6 md:p-10 rounded-lg shadow-md;
+    @apply max-w-6xl mx-auto bg-white p-4 md:p-8 rounded-lg shadow-md;
 }
 
 h1 {
@@ -27,11 +27,11 @@ a:hover {
     @apply text-blue-700;
 }
 
-button {
-    @apply bg-blue-500 text-white p-2 rounded mt-2 md:mt-4;
+.button {
+    @apply bg-blue-500 text-white py-2 px-4 rounded text-center flex-grow;
 }
 
-button:hover {
+.button:hover {
     @apply bg-blue-700;
 }
 
@@ -48,7 +48,7 @@ button:hover {
 }
 
 .card-footer {
-    @apply mt-4;
+    @apply mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4;
 }
 
 .footer {
@@ -235,17 +235,13 @@ button:hover {
 }
 
 .table-auto {
-    @apply w-full text-center;
+    @apply w-full mb-4;
 }
 
 .table-auto th, .table-auto td {
-    @apply border px-4 py-2 whitespace-nowrap;
+    @apply border px-4 py-2;
 }
 
 .form-select {
     @apply border p-2 rounded;
-}
-
-.overflow-x-auto {
-    @apply overflow-x-auto;
 }

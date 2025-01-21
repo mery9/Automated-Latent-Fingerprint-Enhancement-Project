@@ -17,21 +17,21 @@
                 <p><strong>Role:</strong> {{ role }}</p>
             </div>
         </div>
-        <div class="card-footer flex flex-wrap justify-center items-center space-x-4">
+        <div class="card-footer">
             {% if role in ["Citizen", "Police and Investigator"] %}
-                <a href="{{ url_for('enrollment') }}" class="button flex-1 text-center">Go to Enrollment Page</a>
+                <a href="{{ url_for('enrollment') }}" class="button flex-1 mx-auto">Go to Enrollment Page</a>
             {% endif %}
             {% if role == "Police and Investigator" %}
-                <a href="{{ url_for('check_enrollment') }}" class="button flex-1 text-center">Check Enrollment Data</a>
+                <a href="{{ url_for('check_enrollment') }}" class="button flex-1">Check Enrollment Data</a>
             {% endif %}
             {% if role == "Forensic Expertise" %}
-                <a href="{{ url_for('forensic') }}" class="button flex-1 text-center">Go to Forensic Page</a>
+                <a href="{{ url_for('forensic') }}" class="button flex-1">Go to Forensic Page</a>
             {% endif %}
             {% if role == "Government Official" %}
-                <a href="{{ url_for('manage_users') }}" class="button flex-1 text-center">Manage Users</a>
+                <a href="{{ url_for('manage_users') }}" class="button flex-1">Manage Users</a>
                 <a href="{{ url_for('view_logs') }}" class="button flex-1 text-center">View Logs</a>
             {% endif %}
-            <a href="{{ url_for('logout') }}" class="button flex-1 text-center">Logout</a>
+            <a href="{{ url_for('logout') }}" class="logout-button flex-1 text-center">Logout</a>
         </div>
     </div>
     <div class="footer">

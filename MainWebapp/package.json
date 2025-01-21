@@ -1,13 +1,17 @@
 {
   "name": "mainwebapp",
   "version": "1.0.0",
-  "description": "Main Web Application",
   "main": "index.js",
   "scripts": {
-    "build:css": "tailwindcss build D:/Work/Project/WebApp/MainWebapp/static/css/styles.css -o D:/Work/Project/WebApp/MainWebapp/static/css/tailwind.css",
-    "watch:css": "tailwindcss build D:/Work/Project/WebApp/MainWebapp/static/css/styles.css -o D:/Work/Project/WebApp/MainWebapp/static/css/tailwind.css --watch"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.1",
     "tailwindcss": "^3.4.17"
   }
 }

@@ -554,6 +554,144 @@ video {
   display: none;
 }
 
+.container {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
+
+.static {
+  position: static;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.flex {
+  display: flex;
+}
+
+.table {
+  display: table;
+}
+
+.hidden {
+  display: none;
+}
+
+.min-h-screen {
+  min-height: 100vh;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+.table-auto {
+  table-layout: auto;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.space-x-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0;
+  margin-right: calc(1rem * var(--tw-space-x-reverse));
+  margin-left: calc(1rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+.border {
+  border-width: 1px;
+}
+
+.bg-gray-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-gray-800 {
+  --tw-text-opacity: 1;
+  color: rgb(31 41 55 / var(--tw-text-opacity, 1));
+}
+
 /* Custom styles */
 
 body {
@@ -568,10 +706,9 @@ body {
   }
 }
 
-.container {
+.container, .home-container, .enrollment-container, .view-enrollment-container, .message-container {
   margin-left: auto;
   margin-right: auto;
-  max-width: 72rem;
   border-radius: 0.5rem;
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
@@ -582,12 +719,17 @@ body {
 }
 
 @media (min-width: 768px) {
-  .container {
+  .container, .home-container, .enrollment-container, .view-enrollment-container, .message-container {
     padding: 2rem;
   }
 }
 
-h1 {
+.container, .home-container, .enrollment-container, .view-enrollment-container, .message-container {
+  max-width: 90%;
+  min-width: 300px;
+}
+
+h1, .home-header, .enrollment-header, .view-enrollment-header, .message-header {
   margin-bottom: 1rem;
   text-align: center;
   font-size: 1.5rem;
@@ -598,7 +740,7 @@ h1 {
 }
 
 @media (min-width: 768px) {
-  h1 {
+  h1, .home-header, .enrollment-header, .view-enrollment-header, .message-header {
     margin-bottom: 1.5rem;
     font-size: 1.875rem;
     line-height: 2.25rem;
@@ -635,25 +777,42 @@ a:hover {
   color: rgb(29 78 216 / var(--tw-text-opacity, 1));
 }
 
-button {
-  margin-top: 0.5rem;
+.button {
   border-radius: 0.25rem;
   --tw-bg-opacity: 1;
   background-color: rgb(59 130 246 / var(--tw-bg-opacity, 1));
-  padding: 0.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  text-align: center;
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
 
-@media (min-width: 768px) {
-  button {
-    margin-top: 1rem;
-  }
-}
-
-button:hover {
+.button:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(29 78 216 / var(--tw-bg-opacity, 1));
+}
+
+.logout-button {
+  border-radius: 0.25rem;
+  --tw-bg-opacity: 1;
+  background-color: rgb(239 68 68 / var(--tw-bg-opacity, 1));
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  text-align: center;
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+
+.logout-button:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(220 38 38 / var(--tw-bg-opacity, 1));
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
 
 .card {
@@ -696,6 +855,21 @@ button:hover {
 
 .card-footer {
   margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .card-footer {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .card-footer {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 .footer {
@@ -766,101 +940,7 @@ button:hover {
   color: rgb(29 78 216 / var(--tw-text-opacity, 1));
 }
 
-/* Home page styles */
-
-.home-container {
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 56rem;
-  border-radius: 0.5rem;
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
-  padding: 1rem;
-  text-align: center;
-  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-
-@media (min-width: 768px) {
-  .home-container {
-    padding: 2rem;
-  }
-}
-
-.home-header {
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-  line-height: 2rem;
-  font-weight: 700;
-  --tw-text-opacity: 1;
-  color: rgb(31 41 55 / var(--tw-text-opacity, 1));
-}
-
-@media (min-width: 768px) {
-  .home-header {
-    margin-bottom: 1.5rem;
-    font-size: 1.875rem;
-    line-height: 2.25rem;
-  }
-}
-
-.home-link {
-  margin-top: 0.5rem;
-  display: inline-block;
-  --tw-text-opacity: 1;
-  color: rgb(59 130 246 / var(--tw-text-opacity, 1));
-}
-
-@media (min-width: 768px) {
-  .home-link {
-    margin-top: 1rem;
-  }
-}
-
-.home-link:hover {
-  --tw-text-opacity: 1;
-  color: rgb(29 78 216 / var(--tw-text-opacity, 1));
-}
-
-/* Check Enrollment styles */
-
-.enrollment-container {
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 56rem;
-  border-radius: 0.5rem;
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
-  padding: 1rem;
-  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-
-@media (min-width: 768px) {
-  .enrollment-container {
-    padding: 2rem;
-  }
-}
-
-.enrollment-header {
-  margin-bottom: 1rem;
-  text-align: center;
-  font-size: 1.5rem;
-  line-height: 2rem;
-  font-weight: 700;
-  --tw-text-opacity: 1;
-  color: rgb(31 41 55 / var(--tw-text-opacity, 1));
-}
-
-@media (min-width: 768px) {
-  .enrollment-header {
-    margin-bottom: 1.5rem;
-    font-size: 1.875rem;
-    line-height: 2.25rem;
-  }
-}
+/* Enrollment styles */
 
 .enrollment-list {
   list-style-position: inside;
@@ -881,190 +961,7 @@ button:hover {
   color: rgb(29 78 216 / var(--tw-text-opacity, 1));
 }
 
-/* Enrollment styles */
-
-.enrollment-form-container {
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 56rem;
-  border-radius: 0.5rem;
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
-  padding: 1rem;
-  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-
-@media (min-width: 768px) {
-  .enrollment-form-container {
-    padding: 2rem;
-  }
-}
-
-.enrollment-form-header {
-  margin-bottom: 1rem;
-  text-align: center;
-  font-size: 1.5rem;
-  line-height: 2rem;
-  font-weight: 700;
-  --tw-text-opacity: 1;
-  color: rgb(31 41 55 / var(--tw-text-opacity, 1));
-}
-
-@media (min-width: 768px) {
-  .enrollment-form-header {
-    margin-bottom: 1.5rem;
-    font-size: 1.875rem;
-    line-height: 2.25rem;
-  }
-}
-
-.enrollment-form-group {
-  margin-bottom: 1rem;
-}
-
-.enrollment-form-label {
-  margin-bottom: 0.5rem;
-  display: block;
-  font-weight: 600;
-  --tw-text-opacity: 1;
-  color: rgb(55 65 81 / var(--tw-text-opacity, 1));
-}
-
-.enrollment-form-input {
-  width: 100%;
-  border-radius: 0.25rem;
-  border-width: 1px;
-  padding: 0.5rem;
-}
-
-.enrollment-form-button {
-  width: 100%;
-  border-radius: 0.25rem;
-  --tw-bg-opacity: 1;
-  background-color: rgb(59 130 246 / var(--tw-bg-opacity, 1));
-  padding: 0.5rem;
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-
-.enrollment-form-button:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(29 78 216 / var(--tw-bg-opacity, 1));
-}
-
-.enrollment-form-link {
-  margin-top: 1rem;
-  display: inline-block;
-  --tw-text-opacity: 1;
-  color: rgb(59 130 246 / var(--tw-text-opacity, 1));
-}
-
-.enrollment-form-link:hover {
-  --tw-text-opacity: 1;
-  color: rgb(29 78 216 / var(--tw-text-opacity, 1));
-}
-
-/* Error and Success styles */
-
-.message-container {
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 56rem;
-  border-radius: 0.5rem;
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
-  padding: 1rem;
-  text-align: center;
-  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-
-@media (min-width: 768px) {
-  .message-container {
-    padding: 2rem;
-  }
-}
-
-.message-header {
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-  line-height: 2rem;
-  font-weight: 700;
-  --tw-text-opacity: 1;
-  color: rgb(220 38 38 / var(--tw-text-opacity, 1));
-}
-
-@media (min-width: 768px) {
-  .message-header {
-    margin-bottom: 1.5rem;
-    font-size: 1.875rem;
-    line-height: 2.25rem;
-  }
-}
-
-.message-body {
-  margin-bottom: 1rem;
-  --tw-text-opacity: 1;
-  color: rgb(75 85 99 / var(--tw-text-opacity, 1));
-}
-
-.message-link {
-  margin-top: 1rem;
-  display: inline-block;
-  --tw-text-opacity: 1;
-  color: rgb(59 130 246 / var(--tw-text-opacity, 1));
-}
-
-.message-link:hover {
-  --tw-text-opacity: 1;
-  color: rgb(29 78 216 / var(--tw-text-opacity, 1));
-}
-
-.success {
-  color: green;
-}
-
 /* View Enrollment styles */
-
-.view-enrollment-container {
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 56rem;
-  border-radius: 0.5rem;
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
-  padding: 1rem;
-  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-
-@media (min-width: 768px) {
-  .view-enrollment-container {
-    padding: 2rem;
-  }
-}
-
-.view-enrollment-header {
-  margin-bottom: 1rem;
-  text-align: center;
-  font-size: 1.5rem;
-  line-height: 2rem;
-  font-weight: 700;
-  --tw-text-opacity: 1;
-  color: rgb(31 41 55 / var(--tw-text-opacity, 1));
-}
-
-@media (min-width: 768px) {
-  .view-enrollment-header {
-    margin-bottom: 1.5rem;
-    font-size: 1.875rem;
-    line-height: 2.25rem;
-  }
-}
 
 .view-enrollment-body {
   margin-bottom: 1rem;
@@ -1130,6 +1027,30 @@ button:hover {
   background-color: rgb(185 28 28 / var(--tw-bg-opacity, 1));
 }
 
+/* Error and Success styles */
+
+.message-body {
+  margin-bottom: 1rem;
+  --tw-text-opacity: 1;
+  color: rgb(75 85 99 / var(--tw-text-opacity, 1));
+}
+
+.message-link {
+  margin-top: 1rem;
+  display: inline-block;
+  --tw-text-opacity: 1;
+  color: rgb(59 130 246 / var(--tw-text-opacity, 1));
+}
+
+.message-link:hover {
+  --tw-text-opacity: 1;
+  color: rgb(29 78 216 / var(--tw-text-opacity, 1));
+}
+
+.success {
+  color: green;
+}
+
 /* Button styles */
 
 .button {
@@ -1172,4 +1093,19 @@ button:hover {
   border-radius: 0.25rem;
   border-width: 1px;
   padding: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .md\:mb-6 {
+    margin-bottom: 1.5rem;
+  }
+
+  .md\:p-8 {
+    padding: 2rem;
+  }
+
+  .md\:text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
 }

@@ -56,6 +56,11 @@ def save_photo(user_id, finger_type, photo):
     return img_base64
 
 # Route: Home
+
+@app.route("/test")
+def test():
+    return render_template("test.html")
+
 @app.route("/")
 def home():
     return redirect(url_for("login"))

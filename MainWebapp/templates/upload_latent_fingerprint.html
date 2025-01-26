@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Upload Latent Fingerprint</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-4 md:p-8">
+    <div class="container bg-white p-4 md:p-8 rounded-lg shadow-lg">
+        <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800">Upload Latent Fingerprint</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group mb-4">
+                <label for="fingerprint_photo" class="form-label">Latent Fingerprint Photo:</label>
+                <input type="file" id="fingerprint_photo" name="fingerprint_photo" required class="form-input">
+            </div>
+            <button type="submit" class="button">Upload</button>
+        </form>
+        <a href="{{ url_for('main_page') }}" class="button mt-4">Back to Main Page</a>
+    </div>
+</body>
+</html>

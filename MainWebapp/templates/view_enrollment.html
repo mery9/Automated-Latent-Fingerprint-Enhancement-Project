@@ -49,11 +49,13 @@
             <h3 class="text-xl font-semibold mb-2">Left Little</h3>
             <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_left_little }}" alt="Left Little Fingerprint Photo" class="view-enrollment-img">
         </div>
+        {% if not enrollment.approved %}
         <form method="POST">
             <button type="submit" name="approve" class="view-enrollment-button">Approve</button>
             <button type="submit" name="disapprove" class="view-enrollment-button-disapprove">Disapprove</button>
         </form>
-        <a href="{{ url_for('check_enrollment') }}" class="text-blue-500 mt-4 inline-block">Back to Check Enrollment</a>
+        {% endif %}
+        <a href="{{ url_for('view_approved_enrollments') }}" class="text-blue-500 mt-4 inline-block">Back to Approved Enrollments</a>
     </div>
 </body>
 </html>

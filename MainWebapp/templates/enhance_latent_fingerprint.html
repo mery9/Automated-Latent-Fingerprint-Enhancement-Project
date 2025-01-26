@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Enhance Latent Fingerprint</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-4 md:p-8">
+    <div class="container bg-white p-4 md:p-8 rounded-lg shadow-lg">
+        <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800">Enhance Latent Fingerprint</h1>
+        <div class="flex flex-col md:flex-row items-center justify-center">
+            <div class="w-full md:w-1/2 p-4">
+                <h2 class="text-xl font-semibold mb-2">Original Photo</h2>
+                <img src="data:image/jpeg;base64,{{ fingerprint.image_data }}" alt="Original Latent Fingerprint Photo" class="view-enrollment-img">
+            </div>
+            <div class="w-full md:w-1/2 p-4">
+                <h2 class="text-xl font-semibold mb-2">Enhanced Photo</h2>
+                <canvas id="enhancedCanvas" class="view-enrollment-img"></canvas>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <button id="enhanceButton" class="button">Enhance</button>
+            <form method="POST" class="inline-block mt-4">
+                <input type="hidden" name="enhanced_image_data" id="enhancedImageData">
+                <button type="submit" class="button">Save Enhanced Photo</button>
+            </form>
+        </div>
+        <a href="{{ url_for('view_latent_fingerprints') }}" class="button mt-4">Back to Latent Fingerprints</a>
+    </div>
+    <script>
+        document.getElementById('enhanceButton').addEventListener('click', function() {
+            // Placeholder for enhancement logic
+            const canvas = document.getElementById('enhancedCanvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.src = 'data:image/jpeg;base64,{{ fingerprint.image_data }}';
+            img.onload = function() {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                // Apply enhancement filters here
+                ctx.filter = 'contrast(150%) brightness(120%)';
+                ctx.drawImage(img, 0, 0);
+                document.getElementById('enhancedImageData').value = canvas.toDataURL('image/jpeg').split(',')[1];
+            };
+        });
+    </script>
+</body>
+</html>

@@ -8,13 +8,17 @@ body {
 }
 
 .container, .home-container, .enrollment-container, .view-enrollment-container, .message-container {
-    @apply mx-auto bg-white p-4 md:p-8 rounded-lg shadow-md;
-    max-width: 90%;
+    @apply mx-auto bg-white p-4 md:p-8 rounded-lg shadow-md grid-cols-1 content-center;
+    max-width: 85%;
     min-width: 300px;
 }
 
 h1, .home-header, .enrollment-header, .view-enrollment-header, .message-header {
     @apply text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800;
+}
+
+.message-header-success {
+    @apply text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-green-500;
 }
 
 p {
@@ -34,15 +38,19 @@ a:hover {
 }
 
 .button:hover {
-    @apply bg-blue-700;
+    @apply bg-blue-700 text-white py-2 px-4 rounded text-center;
 }
 
 .logout-button {
-    @apply bg-red-500;
+    @apply bg-red-500 text-white py-2 px-4 rounded text-center;
 }
 
 .logout-button:hover {
-    @apply bg-red-700;
+    @apply bg-red-700 text-white py-2 px-4 rounded text-center;
+}
+
+.border-manage-users {
+    @apply mb-4 p-4 rounded-lg shadow-md bg-white;
 }
 
 .card {
@@ -244,6 +252,10 @@ a:hover {
     @apply w-full mb-4 text-center;
 }
 
+.table-auto-manage-users {
+    @apply w-full mb-4 hidden md:table;
+}
+
 .table-auto th, .table-auto td {
     @apply border px-4 py-2 text-center;
 }
@@ -254,7 +266,7 @@ a:hover {
 
 /* Responsive table styles */
 .responsive-table {
-    @apply w-full overflow-x-auto;
+    @apply w-full overflow-x-auto text-center;
 }
 
 .responsive-table table {

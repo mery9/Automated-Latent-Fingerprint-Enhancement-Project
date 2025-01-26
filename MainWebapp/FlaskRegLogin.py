@@ -20,6 +20,7 @@ users_collection = db.users
 enrollments_collection = db.enrollments
 logs_collection = db.logs
 images_collection = db.images
+latent_fingerprints_collection = db.latent_fingerprints_images
 
 # Flask app setup
 app = Flask(__name__)
@@ -204,19 +205,28 @@ def view_enrollment(user_id):
 
     enrollment = enrollments_collection.find_one({"user_id": user_id})
     if not enrollment:
-        return render_template("error.html", message="Enrollment data not found.", back_url=url_for("check_enrollment"))
+        return render_template("error.html", message="Enrollment data not found.", back_url=url_for("view_approved_enrollments"))
 
-    if request.method == "POST":
+    if request.method == "POST" and not enrollment["approved"]:
         if "approve" in request.form:
             enrollments_collection.update_one({"user_id": user_id}, {"$set": {"approved": True}})
             log_action(session["username"], f"Approved enrollment for user {user_id}")
-            return render_template("success.html", message="Enrollment approved.", back_url=url_for("check_enrollment"))
+            return render_template("success.html", message="Enrollment approved.", back_url=url_for("view_approved_enrollments"))
         elif "disapprove" in request.form:
             enrollments_collection.update_one({"user_id": user_id}, {"$set": {"approved": False}})
             log_action(session["username"], f"Disapproved enrollment for user {user_id}")
-            return render_template("success.html", message="Enrollment disapproved.", back_url=url_for("check_enrollment"))
+            return render_template("success.html", message="Enrollment disapproved.", back_url=url_for("view_approved_enrollments"))
 
     return render_template("view_enrollment.html", enrollment=enrollment)
+
+# Route: View Approved Enrollments
+@app.route("/view_approved_enrollments")
+def view_approved_enrollments():
+    if "username" not in session or session["role"] != "Police and Investigator":
+        return redirect(url_for("login"))
+
+    enrollments = enrollments_collection.find({"approved": True})
+    return render_template("view_approved_enrollments.html", enrollments=enrollments)
 
 # Route: Forensic Expertise Page
 @app.route("/forensic", methods=["GET"])
@@ -227,13 +237,86 @@ def forensic():
     enrollments = enrollments_collection.find()
     return render_template("forensic.html", enrollments=enrollments)
 
+# Route: Upload Latent Fingerprint
+@app.route("/upload_latent_fingerprint", methods=["GET", "POST"])
+def upload_latent_fingerprint():
+    if "username" not in session or session["role"] != "Forensic Expertise":
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        if "fingerprint_photo" in request.files:
+            photo = request.files["fingerprint_photo"]
+            filename = secure_filename(photo.filename)
+            photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            photo.save(photo_path)
+            
+            # Convert image to base64
+            with open(photo_path, 'rb') as f:
+                img_data = f.read()
+                img_base64 = base64.b64encode(img_data).decode('utf-8')
+            
+            # Insert into database
+            latent_fingerprints_collection.insert_one({
+                "filename": filename,
+                "image_data": img_base64,
+                "uploaded_by": session["username"],
+                "timestamp": datetime.datetime.now()
+            })
+            log_action(session["username"], "Uploaded latent fingerprint")
+
+            return render_template("success.html", message="Latent fingerprint uploaded successfully.", back_url=url_for("main_page"))
+
+    return render_template("upload_latent_fingerprint.html")
+
+# Route: View Latent Fingerprints
+@app.route("/view_latent_fingerprints")
+def view_latent_fingerprints():
+    if "username" not in session or session["role"] != "Forensic Expertise":
+        return redirect(url_for("login"))
+
+    fingerprints = latent_fingerprints_collection.find()
+    return render_template("view_latent_fingerprints.html", fingerprints=fingerprints)
+
+# Route: Enhance Latent Fingerprint
+@app.route("/enhance_latent_fingerprint/<fingerprint_id>", methods=["GET", "POST"])
+def enhance_latent_fingerprint(fingerprint_id):
+    if "username" not in session or session["role"] != "Forensic Expertise":
+        return redirect(url_for("login"))
+
+    fingerprint = latent_fingerprints_collection.find_one({"_id": ObjectId(fingerprint_id)})
+    if not fingerprint:
+        return render_template("error.html", message="Fingerprint not found.", back_url=url_for("view_latent_fingerprints"))
+
+    if request.method == "POST":
+        enhanced_image_data = request.form.get("enhanced_image_data")
+        if enhanced_image_data:
+            latent_fingerprints_collection.update_one(
+                {"_id": ObjectId(fingerprint_id)},
+                {"$set": {"enhanced_image_data": enhanced_image_data}}
+            )
+            log_action(session["username"], f"Enhanced latent fingerprint {fingerprint_id}")
+            return render_template("success.html", message="Enhanced fingerprint saved successfully.", back_url=url_for("view_latent_fingerprints"))
+
+    return render_template("enhance_latent_fingerprint.html", fingerprint=fingerprint)
+
 # Route: Manage Users
 @app.route("/manage_users", methods=["GET", "POST"])
 def manage_users():
     if "username" not in session or session["role"] != "Government Official":
         return redirect(url_for("login"))
 
-    if request.method == "POST":
+    search_query = request.form.get("search", "").strip()
+
+    query = {}
+    if search_query:
+        query["$or"] = [
+            {"_id": {"$regex": search_query, "$options": "i"}},
+            {"username": {"$regex": search_query, "$options": "i"}},
+            {"role": {"$regex": search_query, "$options": "i"}},
+            {"approved": {"$regex": search_query, "$options": "i"}}
+        ]
+
+    if request.method == "POST" and "user_id" in request.form:
         user_id = request.form.get("user_id")
         new_role = request.form.get("new_role")
         new_approval_status = request.form.get("new_approval_status") == "true"
@@ -241,8 +324,8 @@ def manage_users():
         users_collection.update_one({"_id": ObjectId(user_id)}, {"$set": {"role": new_role, "approved": new_approval_status}})
         log_action(session["username"], f"Updated user {user_id} role to {new_role} and approval status to {new_approval_status}")
 
-    users = list(users_collection.find())
-    return render_template("manage_users.html", users=users)
+    users = list(users_collection.find(query))
+    return render_template("manage_users.html", users=users, search_query=search_query)
 
 # Route: View Logs
 @app.route("/view_logs", methods=["GET", "POST"])

@@ -17,7 +17,7 @@ This project is a web application for managing latent fingerprints, user enrollm
 Before you begin, ensure you have the following installed on your system:
 
 - Python 3.8 or higher
-- Java 11 or higher
+- Java 11
 - MongoDB
 - Maven
 

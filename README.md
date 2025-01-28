@@ -1,6 +1,6 @@
 # Latent Fingerprint Web Application
 
-This project is a web application for managing latent fingerprints, user enrollments, and fingerprint matching. It is built using Flask for the backend, MongoDB for the database, and Gradio for the user interface.
+This project is a web application for managing latent fingerprints, user enrollments, and fingerprint matching. It is built using Flask for the backend, tailwaind for the frontend css, and MongoDB for the database.
 
 ## Table of Contents
 

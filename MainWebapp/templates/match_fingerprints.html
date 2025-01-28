@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Match Fingerprints</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-4 md:p-8">
+    <div class="container bg-white p-4 md:p-8 rounded-lg shadow-lg">
+        <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800">Match Fingerprints</h1>
+        {% if role == "Forensic Expertise" %}
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group mb-4">
+                <label for="fingerprint1" class="form-label">Select First Fingerprint:</label>
+                <input type="file" id="fingerprint1" name="fingerprint1" required class="form-input">
+            </div>
+            <div class="form-group mb-4">
+                <label for="fingerprint2" class="form-label">Select Second Fingerprint:</label>
+                <input type="file" id="fingerprint2" name="fingerprint2" required class="form-input">
+            </div>
+            <button type="submit" class="button">Match Fingerprints</button>
+        </form>
+        {% if similarity_score is not none %}
+        <div class="mt-4">
+            <h2 class="text-xl font-semibold">Similarity Score: {{ similarity_score }}</h2>
+        </div>
+        {% endif %}
+        {% else %}
+        <p class="text-red-500">Access Denied. This page is only accessible to users with the Forensic Expertise role.</p>
+        {% endif %}
+        <a href="{{ url_for('main_page') }}" class="button mt-4">Back to Main Page</a>
+    </div>
+</body>
+</html>

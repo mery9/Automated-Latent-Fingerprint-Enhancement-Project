@@ -8,6 +8,7 @@ from werkzeug.utils import secure_filename
 from io import BytesIO
 from PIL import Image
 import base64
+import subprocess
 
 # Load environment variables
 load_dotenv()
@@ -228,15 +229,6 @@ def view_approved_enrollments():
     enrollments = enrollments_collection.find({"approved": True})
     return render_template("view_approved_enrollments.html", enrollments=enrollments)
 
-# Route: Forensic Expertise Page
-@app.route("/forensic", methods=["GET"])
-def forensic():
-    if "username" not in session or session["role"] != "Forensic Expertise":
-        return redirect(url_for("login"))
-
-    enrollments = enrollments_collection.find()
-    return render_template("forensic.html", enrollments=enrollments)
-
 # Route: Upload Latent Fingerprint
 @app.route("/upload_latent_fingerprint", methods=["GET", "POST"])
 def upload_latent_fingerprint():
@@ -298,6 +290,57 @@ def enhance_latent_fingerprint(fingerprint_id):
             return render_template("success.html", message="Enhanced fingerprint saved successfully.", back_url=url_for("view_latent_fingerprints"))
 
     return render_template("enhance_latent_fingerprint.html", fingerprint=fingerprint)
+
+# Route: Match Fingerprints
+@app.route("/match_fingerprints", methods=["GET", "POST"])
+def match_fingerprints():
+    if "username" not in session or session["role"] != "Forensic Expertise":
+        return redirect(url_for("login"))
+
+    similarity_score = None
+
+    if request.method == "POST":
+        if "fingerprint1" in request.files and "fingerprint2" in request.files:
+            fingerprint1 = request.files["fingerprint1"]
+            fingerprint2 = request.files["fingerprint2"]
+
+            # Save the uploaded files temporarily
+            fingerprint1_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(fingerprint1.filename))
+            fingerprint2_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(fingerprint2.filename))
+            fingerprint1.save(fingerprint1_path)
+            fingerprint2.save(fingerprint2_path)
+
+            print(f"Saved fingerprint1 to {fingerprint1_path}")
+            print(f"Saved fingerprint2 to {fingerprint2_path}")
+
+            try:
+                # Call the Java program to match fingerprints
+                result = subprocess.run(
+                    ["java", "-cp", "D:/Work/Project/WebApp/sourceafis-project/target/sourceafis-project-1.0-SNAPSHOT-jar-with-dependencies.jar", "com.example.FingerprintMatching", fingerprint1_path, fingerprint2_path],
+                    capture_output=True,
+                    text=True,
+                    shell=True  # Add shell=True to ensure the command is executed in the shell
+                )
+
+                print("Java program output:")
+                print(result.stdout)
+                print(result.stderr)
+
+                # Extract the similarity score from the Java program output
+                for line in result.stdout.splitlines():
+                    if "Similarity score:" in line:
+                        similarity_score = line.split(":")[1].strip()
+                        print(f"Extracted similarity score: {similarity_score}")
+                        break
+
+            finally:
+                # Clean up the temporary files
+                if os.path.exists(fingerprint1_path):
+                    os.remove(fingerprint1_path)
+                if os.path.exists(fingerprint2_path):
+                    os.remove(fingerprint2_path)
+
+    return render_template("match_fingerprints.html", similarity_score=similarity_score, role=session["role"])
 
 # Route: Manage Users
 @app.route("/manage_users", methods=["GET", "POST"])

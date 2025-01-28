@@ -16,7 +16,7 @@ This project is a web application for managing latent fingerprints, user enrollm
 
 Before you begin, ensure you have the following installed on your system:
 
-- Python 3.8 or higher
+- Python 3.10.6 (higher version may bugged)
 - Java 11
 - MongoDB
 - Maven
@@ -42,7 +42,6 @@ Before you begin, ensure you have the following installed on your system:
 
 4. **Set up the Java environment**:
    - Ensure that Java is installed and the `JAVA_HOME` environment variable is set.
-   - Add the Java `bin` directory to your system's PATH.
 
 5. **Build the Maven project**:
    ```sh
@@ -55,7 +54,7 @@ Before you begin, ensure you have the following installed on your system:
 
 1. **Create a `.env` file** in the root directory and add the following environment variables:
    ```env
-   MONGO_URI=mongodb://localhost:27017/latent_fingerprint
+   MONGO_URI="mongodb+srv://host:{your Database}.mongodb.net/"
    ```
 
 2. **Ensure MongoDB is running**:

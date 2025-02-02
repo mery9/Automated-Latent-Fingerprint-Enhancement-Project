@@ -12,7 +12,7 @@
         <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800">Identification Logs</h1>
         {% if role == "Forensic Expertise" %}
         <div class="responsive-table">
-            <div class="block md:hidden">
+            <div class="block">
                 {% for log in logs %}
                 <div class="border-manage-users">
                     <p><strong>Log ID:</strong> {{ log._id }}</p>

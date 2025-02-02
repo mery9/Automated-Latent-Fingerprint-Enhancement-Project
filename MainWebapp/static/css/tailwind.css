@@ -659,30 +659,42 @@ a:hover {
   color: rgb(29 78 216 / var(--tw-text-opacity, 1));
 }
 
+/* Button styles */
+
 .button {
+  margin-top: 0.5rem;
+  display: inline-block;
   border-radius: 0.25rem;
   --tw-bg-opacity: 1;
   background-color: rgb(59 130 246 / var(--tw-bg-opacity, 1));
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding: 0.5rem;
   text-align: center;
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
 
+@media (min-width: 768px) {
+  .button {
+    margin-top: 1rem;
+  }
+}
+
 .button:hover {
+  margin-top: 0.5rem;
+  display: inline-block;
   border-radius: 0.25rem;
   --tw-bg-opacity: 1;
   background-color: rgb(29 78 216 / var(--tw-bg-opacity, 1));
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding: 0.5rem;
   text-align: center;
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+
+@media (min-width: 768px) {
+  .button:hover {
+    margin-top: 1rem;
+  }
 }
 
 .button-delete {
@@ -1233,31 +1245,6 @@ a:hover {
   background-color: rgb(185 28 28 / var(--tw-bg-opacity, 1));
 }
 
-/* Button styles */
-
-.button {
-  margin-top: 0.5rem;
-  display: inline-block;
-  border-radius: 0.25rem;
-  --tw-bg-opacity: 1;
-  background-color: rgb(59 130 246 / var(--tw-bg-opacity, 1));
-  padding: 0.5rem;
-  text-align: center;
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-
-@media (min-width: 768px) {
-  .button {
-    margin-top: 1rem;
-  }
-}
-
-.button:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(29 78 216 / var(--tw-bg-opacity, 1));
-}
-
 .table-auto {
   margin-bottom: 1rem;
   width: 100%;
@@ -1270,7 +1257,7 @@ a:hover {
   width: 100%;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .table-auto-manage-users {
     display: table;
   }

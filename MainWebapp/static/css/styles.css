@@ -33,12 +33,13 @@ a:hover {
     @apply text-blue-700;
 }
 
+/* Button styles */
 .button {
-    @apply bg-blue-500 text-white py-2 px-4 rounded text-center;
+    @apply bg-blue-500 text-white p-2 rounded mt-2 md:mt-4 inline-block text-center;
 }
 
 .button:hover {
-    @apply bg-blue-700 text-white py-2 px-4 rounded text-center;
+    @apply bg-blue-700 text-white p-2 rounded mt-2 md:mt-4 inline-block text-center;
 }
 
 .button-delete{
@@ -247,21 +248,14 @@ a:hover {
     @apply bg-red-700;
 }
 
-/* Button styles */
-.button {
-    @apply bg-blue-500 text-white p-2 rounded mt-2 md:mt-4 inline-block text-center;
-}
 
-.button:hover {
-    @apply bg-blue-700;
-}
 
 .table-auto {
     @apply w-full mb-4 text-center;
 }
 
 .table-auto-manage-users {
-    @apply w-full mb-4 hidden md:table;
+    @apply w-full mb-4 hidden lg:table;
 }
 
 .table-auto th, .table-auto td {

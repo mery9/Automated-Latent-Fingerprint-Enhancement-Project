@@ -8,3 +8,6 @@ Pillow==8.4.0
 Werkzeug==2.0.2
 requests==2.26.0
 python-dotenv==0.19.1
+Flask-SocketIO==5.5.1
+celery==5.4.0
+redis==5.2.1

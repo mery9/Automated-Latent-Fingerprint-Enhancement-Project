@@ -41,6 +41,14 @@ a:hover {
     @apply bg-blue-700 text-white py-2 px-4 rounded text-center;
 }
 
+.button-delete{
+    @apply bg-red-500 text-white py-2 px-4 rounded text-center;
+}
+
+.button-delete:hover{
+    @apply bg-red-700 text-white py-2 px-4 rounded text-center;
+}
+
 .logout-button {
     @apply bg-red-500 text-white py-2 px-4 rounded text-center;
 }
@@ -293,4 +301,36 @@ a:hover {
     .responsive-table tr {
         @apply mb-4;
     }
+}
+
+/* Loading Spinner Styles */
+.spinner {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 9999;
+    top: 50%;
+    left: 50%;
+    width: 80px; /* Increased size */
+    height: 80px; /* Increased size */
+    margin: -40px 0 0 -40px; /* Center the spinner */
+    border: 8px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #201dff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Fixed size for fingerprint images */
+.fixed-size-img {
+    width: 3in; /* 3 inches */
+    height: 3in; /* 3 inches */
+    object-fit: cover; /* Ensure the image covers the entire area */
 }

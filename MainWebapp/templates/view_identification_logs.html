@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Identification Logs</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-4 md:p-8">
+    <div class="container bg-white p-4 md:p-8 rounded-lg shadow-lg">
+        <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800">Identification Logs</h1>
+        {% if role == "Forensic Expertise" %}
+        <div class="responsive-table">
+            <div class="block md:hidden">
+                {% for log in logs %}
+                <div class="border-manage-users">
+                    <p><strong>Log ID:</strong> {{ log._id }}</p>
+                    <p><strong>Timestamp:</strong> {{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                    <div class="mt-2">
+                        {% if log.status == "processing" %}
+                            <span class="text-yellow-500">Processing...</span>
+                        {% else %}
+                            <a href="{{ url_for('view_identification_result', log_id=log._id) }}" class="button">View Result</a>
+                        {% endif %}
+                        <form method="POST" style="display:inline;">
+                            <input type="hidden" name="log_id" value="{{ log._id }}">
+                            <button type="submit" class="button-delete">Delete</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <table class="table-auto-manage-users">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2">Log ID</th>
+                        <th class="px-4 py-2">Timestamp</th>
+                        <th class="px-4 py-2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr class="{% if loop.index is even %}bg-gray-100{% else %}bg-white{% endif %}">
+                        <td class="border px-4 py-2">{{ log._id }}</td>
+                        <td class="border px-4 py-2">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td class="border px-4 py-2">
+                            {% if log.status == "processing" %}
+                                <span class="text-yellow-500">Processing...</span>
+                            {% else %}
+                                <a href="{{ url_for('view_identification_result', log_id=log._id) }}" class="button">View Result</a>
+                            {% endif %}
+                            <form method="POST" style="display:inline;">
+                                <input type="hidden" name="log_id" value="{{ log._id }}">
+                                <button type="submit" class="button-delete">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-red-500">Access Denied. This page is only accessible to users with the Forensic Expertise role.</p>
+        {% endif %}
+        <a href="{{ url_for('main_page') }}" class="button mt-4">Back to Main Page</a>
+    </div>
+</body>
+</html>

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
 </head>
 <body class="bg-gray-100 p-4 md:p-8">
     <div class="view-enrollment-container">
@@ -20,34 +21,34 @@
             <p><strong>Blood Type:</strong> {{ enrollment.blood_type }}</p>
             
             <h3 class="text-xl font-semibold mb-2">Right Thumb</h3>
-            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_right_thumb }}" alt="Right Thumb Fingerprint Photo" class="view-enrollment-img">
+            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_right_thumb }}" alt="Right Thumb Fingerprint Photo" class="view-enrollment-img fixed-size-img">
             
             <h3 class="text-xl font-semibold mb-2">Right Index</h3>
-            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_right_index }}" alt="Right Index Fingerprint Photo" class="view-enrollment-img">
+            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_right_index }}" alt="Right Index Fingerprint Photo" class="view-enrollment-img fixed-size-img">
             
             <h3 class="text-xl font-semibold mb-2">Right Middle</h3>
-            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_right_middle }}" alt="Right Middle Fingerprint Photo" class="view-enrollment-img">
+            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_right_middle }}" alt="Right Middle Fingerprint Photo" class="view-enrollment-img fixed-size-img">
             
             <h3 class="text-xl font-semibold mb-2">Right Ring</h3>
-            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_right_ring }}" alt="Right Ring Fingerprint Photo" class="view-enrollment-img">
+            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_right_ring }}" alt="Right Ring Fingerprint Photo" class="view-enrollment-img fixed-size-img">
             
             <h3 class="text-xl font-semibold mb-2">Right Little</h3>
-            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_right_little }}" alt="Right Little Fingerprint Photo" class="view-enrollment-img">
+            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_right_little }}" alt="Right Little Fingerprint Photo" class="view-enrollment-img fixed-size-img">
             
             <h3 class="text-xl font-semibold mb-2">Left Thumb</h3>
-            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_left_thumb }}" alt="Left Thumb Fingerprint Photo" class="view-enrollment-img">
+            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_left_thumb }}" alt="Left Thumb Fingerprint Photo" class="view-enrollment-img fixed-size-img">
             
             <h3 class="text-xl font-semibold mb-2">Left Index</h3>
-            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_left_index }}" alt="Left Index Fingerprint Photo" class="view-enrollment-img">
+            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_left_index }}" alt="Left Index Fingerprint Photo" class="view-enrollment-img fixed-size-img">
             
             <h3 class="text-xl font-semibold mb-2">Left Middle</h3>
-            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_left_middle }}" alt="Left Middle Fingerprint Photo" class="view-enrollment-img">
+            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_left_middle }}" alt="Left Middle Fingerprint Photo" class="view-enrollment-img fixed-size-img">
             
             <h3 class="text-xl font-semibold mb-2">Left Ring</h3>
-            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_left_ring }}" alt="Left Ring Fingerprint Photo" class="view-enrollment-img">
+            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_left_ring }}" alt="Left Ring Fingerprint Photo" class="view-enrollment-img fixed-size-img">
             
             <h3 class="text-xl font-semibold mb-2">Left Little</h3>
-            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_left_little }}" alt="Left Little Fingerprint Photo" class="view-enrollment-img">
+            <img src="data:image/jpeg;base64,{{ enrollment.fingerprints_left_little }}" alt="Left Little Fingerprint Photo" class="view-enrollment-img fixed-size-img">
         </div>
         {% if not enrollment.approved %}
         <form method="POST">

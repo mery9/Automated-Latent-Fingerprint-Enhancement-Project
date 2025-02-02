@@ -685,6 +685,32 @@ a:hover {
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
 
+.button-delete {
+  border-radius: 0.25rem;
+  --tw-bg-opacity: 1;
+  background-color: rgb(239 68 68 / var(--tw-bg-opacity, 1));
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  text-align: center;
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+
+.button-delete:hover {
+  border-radius: 0.25rem;
+  --tw-bg-opacity: 1;
+  background-color: rgb(185 28 28 / var(--tw-bg-opacity, 1));
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  text-align: center;
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+
 .logout-button {
   border-radius: 0.25rem;
   --tw-bg-opacity: 1;
@@ -1306,4 +1332,47 @@ a:hover {
   .responsive-table tr {
     margin-bottom: 1rem;
   }
+}
+
+/* Loading Spinner Styles */
+
+.spinner {
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  z-index: 9999;
+  top: 50%;
+  left: 50%;
+  width: 80px;
+  /* Increased size */
+  height: 80px;
+  /* Increased size */
+  margin: -40px 0 0 -40px;
+  /* Center the spinner */
+  border: 8px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #201dff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Fixed size for fingerprint images */
+
+.fixed-size-img {
+  width: 3in;
+  /* 3 inches */
+  height: 3in;
+  /* 3 inches */
+  -o-object-fit: cover;
+     object-fit: cover;
+  /* Ensure the image covers the entire area */
 }

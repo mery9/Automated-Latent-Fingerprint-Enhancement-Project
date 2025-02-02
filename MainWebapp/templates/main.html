@@ -26,9 +26,10 @@
                 <a href="{{ url_for('view_approved_enrollments') }}" class="button flex-1">View Enrollment Data</a>
             {% endif %}
             {% if role == "Forensic Expertise" %}
-                <a href="{{ url_for('match_fingerprints') }}" class="button flex-1">Go to Forensic Page</a>
+                <a href="{{ url_for('match_fingerprints') }}" class="button flex-1">Go to Verification Page</a>
                 <a href="{{ url_for('upload_latent_fingerprint') }}" class="button flex-1">Upload Latent Fingerprint</a>
                 <a href="{{ url_for('view_latent_fingerprints') }}" class="button flex-1">View Latent Fingerprints</a>
+                <a href="{{ url_for('identify_fingerprints') }}" class="button flex-1">Go to Identification Page</a>
             {% endif %}
             {% if role == "Government Official" %}
                 <a href="{{ url_for('manage_users') }}" class="button flex-1">Manage Users</a>

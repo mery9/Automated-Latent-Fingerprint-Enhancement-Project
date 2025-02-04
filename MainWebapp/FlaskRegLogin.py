@@ -227,47 +227,6 @@ def view_approved_enrollments():
     enrollments = enrollments_collection.find({"approved": True})
     return render_template("view_approved_enrollments.html", enrollments=enrollments)
 
-# Route: Upload Latent Fingerprint
-@app.route("/upload_latent_fingerprint", methods=["GET", "POST"])
-def upload_latent_fingerprint():
-    if "username" not in session or session["role"] != "Forensic Expertise":
-        return redirect(url_for("login"))
-
-    if request.method == "POST":
-        if "fingerprint_photos" in request.files:
-            files = request.files.getlist("fingerprint_photos")
-            for photo in files:
-                filename = secure_filename(photo.filename)
-                photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                photo.save(photo_path)
-                
-                # Convert image to base64
-                with open(photo_path, 'rb') as f:
-                    img_data = f.read()
-                    img_base64 = base64.b64encode(img_data).decode('utf-8')
-                
-                # Insert into database
-                latent_fingerprints_collection.insert_one({
-                    "filename": filename,
-                    "image_data": img_base64,
-                    "uploaded_by": session["username"],
-                    "timestamp": datetime.datetime.now()
-                })
-                log_action(session["username"], f"Uploaded latent fingerprint: {filename}")
-
-            return render_template("success.html", message="Latent fingerprints uploaded successfully.", back_url=url_for("main_page"))
-
-    return render_template("upload_latent_fingerprint.html")
-
-# Route: View Latent Fingerprints
-@app.route("/view_latent_fingerprints")
-def view_latent_fingerprints():
-    if "username" not in session or session["role"] != "Forensic Expertise":
-        return redirect(url_for("login"))
-
-    fingerprints = latent_fingerprints_collection.find()
-    return render_template("view_latent_fingerprints.html", fingerprints=fingerprints)
-
 # Route: Enhance Latent Fingerprint
 @app.route("/enhance_latent_fingerprint/<fingerprint_id>", methods=["GET", "POST"])
 def enhance_latent_fingerprint(fingerprint_id):
@@ -355,55 +314,58 @@ def match_fingerprints():
     return render_template("match_fingerprints.html", user_data=user_data, similarity_score=similarity_score, role=session["role"])
 
 # Function to process identification in the background
-def process_identification(log_id, fingerprint1_id, fingerprint1_type, username):
-    fingerprint1 = enrollments_collection.find_one({"_id": ObjectId(fingerprint1_id)})
-    latent_fingerprints = list(latent_fingerprints_collection.find())
+def process_identification(log_id, uploaded_fingerprint_path, username):
+    enrollments = list(enrollments_collection.find({"approved": True}))
     results = []
 
-    if fingerprint1:
-        fingerprint1_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{fingerprint1_id}_{fingerprint1_type}.jpg")
+    try:
+        # Match against all enrollment fingerprints
+        for enrollment in enrollments:
+            for fingerprint_type in ["right_thumb", "right_index", "right_middle", "right_ring", "right_little",
+                                     "left_thumb", "left_index", "left_middle", "left_ring", "left_little"]:
+                if f"fingerprints_{fingerprint_type}" in enrollment:
+                    fingerprint2_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{enrollment['_id']}_{fingerprint_type}.jpg")
 
-        with open(fingerprint1_path, "wb") as f1:
-            f1.write(base64.b64decode(fingerprint1[f"fingerprints_{fingerprint1_type}"]))
+                    with open(fingerprint2_path, "wb") as f2:
+                        f2.write(base64.b64decode(enrollment[f"fingerprints_{fingerprint_type}"]))
 
-        try:
-            # Match against all latent fingerprints
-            for latent_fingerprint in latent_fingerprints:
-                fingerprint2_id = latent_fingerprint["_id"]
-                fingerprint2_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{fingerprint2_id}.jpg")
+                    result = subprocess.run(
+                        ["java", "-cp", "D:/Work/Project/WebApp/sourceafis-project/target/sourceafis-project-1.0-SNAPSHOT-jar-with-dependencies.jar", "com.example.FingerprintMatching", uploaded_fingerprint_path, fingerprint2_path],
+                        capture_output=True,
+                        text=True,
+                        shell=True
+                    )
 
-                with open(fingerprint2_path, "wb") as f2:
-                    f2.write(base64.b64decode(latent_fingerprint["image_data"]))
+                    print("Java program output:")
+                    print(result.stdout)
+                    print(result.stderr)
 
-                result = subprocess.run(
-                    ["java", "-cp", "D:/Work/Project/WebApp/sourceafis-project/target/sourceafis-project-1.0-SNAPSHOT-jar-with-dependencies.jar", "com.example.FingerprintMatching", fingerprint1_path, fingerprint2_path],
-                    capture_output=True,
-                    text=True,
-                    shell=True
-                )
+                    for line in result.stdout.splitlines():
+                        if "Similarity score:" in line:
+                            similarity_score = float(line.split(":")[1].strip())
+                            results.append({
+                                "user_id": enrollment["user_id"],
+                                "fingerprint_type": fingerprint_type,
+                                "similarity_score": similarity_score
+                            })
+                            break
 
-                for line in result.stdout.splitlines():
-                    if "Similarity score:" in line:
-                        similarity_score = float(line.split(":")[1].strip())
-                        results.append((latent_fingerprint["filename"], similarity_score, latent_fingerprint["image_data"]))
-                        break
+                    if os.path.exists(fingerprint2_path):
+                        os.remove(fingerprint2_path)
 
-                if os.path.exists(fingerprint2_path):
-                    os.remove(fingerprint2_path)
+        # Sort results by similarity score in descending order and take top 20
+        results.sort(key=lambda x: x["similarity_score"], reverse=True)
+        results = results[:20]
 
-            # Sort results by similarity score in descending order and take top 20
-            results.sort(key=lambda x: x[1], reverse=True)
-            results = results[:20]
+        # Update the log entry with the results
+        identification_results_collection.update_one(
+            {"_id": ObjectId(log_id)},
+            {"$set": {"results": results, "status": "completed"}}
+        )
 
-            # Update the log entry with the results
-            identification_results_collection.update_one(
-                {"_id": ObjectId(log_id)},
-                {"$set": {"results": results, "status": "completed"}}
-            )
-
-        finally:
-            if os.path.exists(fingerprint1_path):
-                os.remove(fingerprint1_path)
+    finally:
+        if os.path.exists(uploaded_fingerprint_path):
+            os.remove(uploaded_fingerprint_path)
 
 # Route: Identify Fingerprints
 @app.route("/identify_fingerprints", methods=["GET", "POST"])
@@ -411,28 +373,27 @@ def identify_fingerprints():
     if "username" not in session or session["role"] != "Forensic Expertise":
         return redirect(url_for("login"))
 
-    fingerprints = list(enrollments_collection.find({"approved": True}))
-
     if request.method == "POST":
-        fingerprint1_id = request.form.get("fingerprint1")
-        fingerprint1_type = request.form.get("fingerprint1_type")
+        if "fingerprint_photo" in request.files:
+            fingerprint_photo = request.files["fingerprint_photo"]
+            filename = secure_filename(fingerprint_photo.filename)
+            uploaded_fingerprint_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            fingerprint_photo.save(uploaded_fingerprint_path)
 
-        if fingerprint1_id and fingerprint1_type:
             # Create a log entry with "processing" status
             log_id = identification_results_collection.insert_one({
                 "user": session["username"],
-                "fingerprint1_id": fingerprint1_id,
-                "fingerprint1_type": fingerprint1_type,
+                "uploaded_fingerprint": filename,
                 "results": [],
                 "status": "processing",
                 "timestamp": datetime.datetime.now()
             }).inserted_id
 
             # Start the background process
-            threading.Thread(target=process_identification, args=(log_id, fingerprint1_id, fingerprint1_type, session["username"])).start()
+            threading.Thread(target=process_identification, args=(log_id, uploaded_fingerprint_path, session["username"])).start()
             return render_template("success.html", message="Identification process started. You can check the results in the log.", back_url=url_for("identify_fingerprints"))
 
-    return render_template("identify_fingerprints.html", fingerprints=fingerprints, role=session["role"])
+    return render_template("identify_fingerprints.html", role=session["role"])
 
 # Route: View Identification Logs
 @app.route("/view_identification_logs", methods=["GET", "POST"])
@@ -459,11 +420,20 @@ def view_identification_result(log_id):
     if not log:
         return render_template("error.html", message="Log not found.", back_url=url_for("view_identification_logs"))
 
-    enrollment = enrollments_collection.find_one({"_id": ObjectId(log["fingerprint1_id"])})
-    if not enrollment:
-        return render_template("error.html", message="Enrollment data not found.", back_url=url_for("view_identification_logs"))
+    results = log.get("results", [])
+    enrollments = []
 
-    return render_template("view_identification_result.html", log=log, enrollment=enrollment, role=session["role"])
+    for result in results:
+        enrollment = enrollments_collection.find_one({"user_id": result["user_id"]})
+        if enrollment:
+            enrollments.append({
+                "user_id": result["user_id"],
+                "fingerprint_type": result["fingerprint_type"],
+                "similarity_score": result["similarity_score"],
+                "enrollment": enrollment
+            })
+
+    return render_template("view_identification_result.html", log=log, enrollments=enrollments, role=session["role"])
 
 # Route: Get Latent Fingerprint Image
 @app.route("/get_latent_fingerprint_image/<fingerprint_id>")

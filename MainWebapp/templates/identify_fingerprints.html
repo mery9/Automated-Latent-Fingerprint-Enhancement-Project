@@ -7,50 +7,6 @@
     <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
     <script>
-        function updateFingerprintImage(selectElement, imageElementId) {
-            const selectedOption = selectElement.options[selectElement.selectedIndex];
-            const fingerprintId = selectedOption.value;
-            const fingerprintType = document.getElementById(selectElement.dataset.type)?.value;
-            const imageElement = document.getElementById(imageElementId);
-
-            if (fingerprintId && fingerprintType) {
-                fetch(`/get_fingerprint_image/${fingerprintId}/${fingerprintType}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.image) {
-                            imageElement.src = `data:image/jpeg;base64,${data.image}`;
-                        } else {
-                            imageElement.src = '';
-                        }
-                    });
-            } else {
-                imageElement.src = '';
-            }
-        }
-
-        function updateFingerprintTypes(selectElement, typeElementId) {
-            const selectedOption = selectElement.options[selectElement.selectedIndex];
-            const fingerprintId = selectedOption.value;
-            const typeElement = document.getElementById(typeElementId);
-
-            if (fingerprintId) {
-                fetch(`/get_available_fingerprints/${fingerprintId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        typeElement.innerHTML = '';
-                        data.available_fingerprints.forEach(fingerprintType => {
-                            const option = document.createElement('option');
-                            option.value = fingerprintType;
-                            option.textContent = fingerprintType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
-                            typeElement.appendChild(option);
-                        });
-                        updateFingerprintImage(selectElement, typeElement.dataset.image);
-                    });
-            } else {
-                typeElement.innerHTML = '';
-            }
-        }
-
         function showSpinner() {
             document.getElementById('spinner').style.display = 'block';
         }
@@ -60,24 +16,10 @@
     <div class="container bg-white p-4 md:p-8 rounded-lg shadow-lg">
         <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800">Identify Fingerprints</h1>
         {% if role == "Forensic Expertise" %}
-        <form method="POST" onsubmit="showSpinner()">
-            <div class="form-group mb-4">
-                <label for="fingerprint1" class="form-label">Select Enrollment Data:</label>
-                <select id="fingerprint1" name="fingerprint1" required class="form-input" data-type="fingerprint1_type" onchange="updateFingerprintTypes(this, 'fingerprint1_type')">
-                    <option value="">Select a person</option>
-                    {% for fingerprint in fingerprints %}
-                        <option value="{{ fingerprint._id }}">{{ fingerprint.firstname }} {{ fingerprint.lastname }} - {{ fingerprint.user_id }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="form-group mb-4">
-                <label for="fingerprint1_type" class="form-label">Select Fingerprint:</label>
-                <select id="fingerprint1_type" name="fingerprint1_type" required class="form-input" data-image="fingerprint1_image" onchange="updateFingerprintImage(document.getElementById('fingerprint1'), 'fingerprint1_image')">
-                    <!-- Options will be dynamically populated -->
-                </select>
-            </div>
-            <img id="fingerprint1_image" src="" alt="Fingerprint Image" class="w-60 h-60 border border-gray-300 rounded mb-4 fixed-size-img">
-            <button type="submit" class="button">Identify Fingerprints</button>
+        <form method="POST" enctype="multipart/form-data" class="mb-4" onsubmit="showSpinner()">
+            <label for="fingerprint_photo" class="form-label">Upload Fingerprint Photo:</label>
+            <input type="file" name="fingerprint_photo" class="form-input mb-4" required>
+            <button type="submit" class="button">Identify Fingerprint</button>
         </form>
         <a href="{{ url_for('view_identification_logs') }}" class="button mt-4">View Identification Logs</a>
         {% else %}

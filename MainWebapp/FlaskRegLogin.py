@@ -296,58 +296,63 @@ def match_fingerprints():
     if "username" not in session or session["role"] != "Forensic Expertise":
         return redirect(url_for("login"))
 
+    user_data = None
     similarity_score = None
-    fingerprints = list(enrollments_collection.find({"approved": True}))
-    latent_fingerprints = list(latent_fingerprints_collection.find())
 
     if request.method == "POST":
-        fingerprint1_id = request.form.get("fingerprint1")
-        fingerprint1_type = request.form.get("fingerprint1_type")
-        fingerprint2_id = request.form.get("fingerprint2")
+        if "search_user" in request.form:
+            user_id = request.form.get("user_id")
+            user_data = enrollments_collection.find_one({"user_id": user_id})
+            if not user_data:
+                return render_template("error.html", message="User not found.", back_url=url_for("match_fingerprints"))
 
-        if fingerprint1_id and fingerprint2_id and fingerprint1_type:
-            fingerprint1 = enrollments_collection.find_one({"_id": ObjectId(fingerprint1_id)})
-            fingerprint2 = latent_fingerprints_collection.find_one({"_id": ObjectId(fingerprint2_id)})
+        elif "match_fingerprints" in request.form:
+            fingerprint1_id = request.form.get("fingerprint1_id")
+            fingerprint1_type = request.form.get("fingerprint1_type")
+            latent_fingerprint = request.files.get("latent_fingerprint")
 
-            if fingerprint1 and fingerprint2:
-                fingerprint1_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{fingerprint1_id}_{fingerprint1_type}.jpg")
-                fingerprint2_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{fingerprint2_id}.jpg")
+            if fingerprint1_id and fingerprint1_type and latent_fingerprint:
+                fingerprint1 = enrollments_collection.find_one({"_id": ObjectId(fingerprint1_id)})
 
-                with open(fingerprint1_path, "wb") as f1, open(fingerprint2_path, "wb") as f2:
-                    f1.write(base64.b64decode(fingerprint1[f"fingerprints_{fingerprint1_type}"]))
-                    f2.write(base64.b64decode(fingerprint2["image_data"]))
+                if fingerprint1:
+                    fingerprint1_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{fingerprint1_id}_{fingerprint1_type}.jpg")
+                    latent_fingerprint_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(latent_fingerprint.filename))
+                    latent_fingerprint.save(latent_fingerprint_path)
 
-                try:
-                    # Call the Java program to match fingerprints
-                    result = subprocess.run(
-                        ["java", "-cp", "D:/Work/Project/WebApp/sourceafis-project/target/sourceafis-project-1.0-SNAPSHOT-jar-with-dependencies.jar", "com.example.FingerprintMatching", fingerprint1_path, fingerprint2_path],
-                        capture_output=True,
-                        text=True,
-                        shell=True
-                    )
+                    with open(fingerprint1_path, "wb") as f1:
+                        f1.write(base64.b64decode(fingerprint1[f"fingerprints_{fingerprint1_type}"]))
 
-                    print("Java program output:")
-                    print(result.stdout)
-                    print(result.stderr)
+                    try:
+                        # Call the Java program to match fingerprints
+                        result = subprocess.run(
+                            ["java", "-cp", "D:/Work/Project/WebApp/sourceafis-project/target/sourceafis-project-1.0-SNAPSHOT-jar-with-dependencies.jar", "com.example.FingerprintMatching", fingerprint1_path, latent_fingerprint_path],
+                            capture_output=True,
+                            text=True,
+                            shell=True
+                        )
 
-                    # Extract the similarity score from the Java program output
-                    for line in result.stdout.splitlines():
-                        if "Similarity score:" in line:
-                            similarity_score = line.split(":")[1].strip()
-                            print(f"Extracted similarity score: {similarity_score}")
-                            break
+                        print("Java program output:")
+                        print(result.stdout)
+                        print(result.stderr)
 
-                    # Log the action
-                    log_action(session["username"], f"Matched fingerprints: {fingerprint1_id} ({fingerprint1_type}) with latent fingerprint {fingerprint2_id}. Similarity score: {similarity_score}")
+                        # Extract the similarity score from the Java program output
+                        for line in result.stdout.splitlines():
+                            if "Similarity score:" in line:
+                                similarity_score = line.split(":")[1].strip()
+                                print(f"Extracted similarity score: {similarity_score}")
+                                break
 
-                finally:
-                    # Clean up the temporary files
-                    if os.path.exists(fingerprint1_path):
-                        os.remove(fingerprint1_path)
-                    if os.path.exists(fingerprint2_path):
-                        os.remove(fingerprint2_path)
+                        # Log the action
+                        log_action(session["username"], f"Matched fingerprints: {fingerprint1_id} ({fingerprint1_type}) with latent fingerprint. Similarity score: {similarity_score}")
 
-    return render_template("match_fingerprints.html", fingerprints=fingerprints, latent_fingerprints=latent_fingerprints, similarity_score=similarity_score, role=session["role"])
+                    finally:
+                        # Clean up the temporary files
+                        if os.path.exists(fingerprint1_path):
+                            os.remove(fingerprint1_path)
+                        if os.path.exists(latent_fingerprint_path):
+                            os.remove(latent_fingerprint_path)
+
+    return render_template("match_fingerprints.html", user_data=user_data, similarity_score=similarity_score, role=session["role"])
 
 # Function to process identification in the background
 def process_identification(log_id, fingerprint1_id, fingerprint1_type, username):

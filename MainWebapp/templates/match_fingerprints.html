@@ -9,22 +9,12 @@
     <script>
         function updateFingerprintImage(selectElement, imageElementId) {
             const selectedOption = selectElement.options[selectElement.selectedIndex];
-            const fingerprintId = selectedOption.value;
-            const fingerprintType = document.getElementById(selectElement.dataset.type)?.value;
+            const fingerprintId = document.querySelector('input[name="fingerprint1_id"]').value;
+            const fingerprintType = selectedOption.value;
             const imageElement = document.getElementById(imageElementId);
 
             if (fingerprintId && fingerprintType) {
                 fetch(`/get_fingerprint_image/${fingerprintId}/${fingerprintType}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.image) {
-                            imageElement.src = `data:image/jpeg;base64,${data.image}`;
-                        } else {
-                            imageElement.src = '';
-                        }
-                    });
-            } else if (fingerprintId) {
-                fetch(`/get_latent_fingerprint_image/${fingerprintId}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.image) {
@@ -38,28 +28,12 @@
             }
         }
 
-        function updateFingerprintTypes(selectElement, typeElementId) {
-            const selectedOption = selectElement.options[selectElement.selectedIndex];
-            const fingerprintId = selectedOption.value;
-            const typeElement = document.getElementById(typeElementId);
-
-            if (fingerprintId) {
-                fetch(`/get_available_fingerprints/${fingerprintId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        typeElement.innerHTML = '';
-                        data.available_fingerprints.forEach(fingerprintType => {
-                            const option = document.createElement('option');
-                            option.value = fingerprintType;
-                            option.textContent = fingerprintType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
-                            typeElement.appendChild(option);
-                        });
-                        updateFingerprintImage(selectElement, typeElement.dataset.image);
-                    });
-            } else {
-                typeElement.innerHTML = '';
+        document.addEventListener('DOMContentLoaded', function() {
+            const fingerprintTypeSelect = document.querySelector('select[name="fingerprint1_type"]');
+            if (fingerprintTypeSelect) {
+                updateFingerprintImage(fingerprintTypeSelect, 'fingerprint1_image');
             }
-        }
+        });
 
         function showSpinner() {
             document.getElementById('spinner').style.display = 'block';
@@ -70,35 +44,43 @@
     <div class="container bg-white p-4 md:p-8 rounded-lg shadow-lg">
         <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800">Match Fingerprints</h1>
         {% if role == "Forensic Expertise" %}
-        <form method="POST" onsubmit="showSpinner()">
-            <div class="form-group mb-4">
-                <label for="fingerprint1" class="form-label">Select First Person:</label>
-                <select id="fingerprint1" name="fingerprint1" required class="form-input" data-type="fingerprint1_type" onchange="updateFingerprintTypes(this, 'fingerprint1_type')">
-                    <option value="">Select a person</option>
-                    {% for fingerprint in fingerprints %}
-                        <option value="{{ fingerprint._id }}">{{ fingerprint.firstname }} {{ fingerprint.lastname }} - {{ fingerprint.user_id }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="form-group mb-4">
-                <label for="fingerprint1_type" class="form-label">Select First Fingerprint:</label>
-                <select id="fingerprint1_type" name="fingerprint1_type" required class="form-input" data-image="fingerprint1_image" onchange="updateFingerprintImage(document.getElementById('fingerprint1'), 'fingerprint1_image')">
-                    <!-- Options will be dynamically populated -->
-                </select>
-            </div>
-            <img id="fingerprint1_image" src="" alt="First Fingerprint Image" class="w-60 h-60 border border-gray-300 rounded mb-4">
-            <div class="form-group mb-4">
-                <label for="fingerprint2" class="form-label">Select Latent Fingerprint:</label>
-                <select id="fingerprint2" name="fingerprint2" required class="form-input" onchange="updateFingerprintImage(this, 'fingerprint2_image')">
-                    <option value="">Select a latent fingerprint</option>
-                    {% for fingerprint in latent_fingerprints %}
-                        <option value="{{ fingerprint._id }}">{{ fingerprint.filename }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <img id="fingerprint2_image" src="" alt="Second Fingerprint Image" class="w-60 h-60 border border-gray-300 rounded mb-4">
-            <button type="submit" class="button">Match Fingerprints</button>
+        <form method="POST" class="mb-4">
+            <input type="text" name="user_id" placeholder="Enter User ID" value="{{ request.form.user_id }}" class="form-input w-full mb-2">
+            <button type="submit" name="search_user" class="button">Search User</button>
         </form>
+        {% if user_data %}
+        <div class="card">
+            <div class="card-header">User Information</div>
+            <div class="card-body">
+                <p><strong>User ID:</strong> {{ user_data.user_id }}</p>
+                <p><strong>First Name:</strong> {{ user_data.firstname }}</p>
+                <p><strong>Last Name:</strong> {{ user_data.lastname }}</p>
+                <p><strong>Gender:</strong> {{ user_data.gender }}</p>
+                <p><strong>Contact Info:</strong> {{ user_data.contact_info }}</p>
+                <p><strong>Blood Type:</strong> {{ user_data.blood_type }}</p>
+            </div>
+        </div>
+        <form method="POST" enctype="multipart/form-data" class="mt-4">
+            <input type="hidden" name="fingerprint1_id" value="{{ user_data._id }}">
+            <label for="fingerprint1_type" class="form-label">Select Fingerprint Type:</label>
+            <select name="fingerprint1_type" class="form-select mb-4" onchange="updateFingerprintImage(this, 'fingerprint1_image')">
+                <option value="right_thumb" {% if request.form.fingerprint1_type == "right_thumb" %}selected{% endif %}>Right Thumb</option>
+                <option value="right_index" {% if request.form.fingerprint1_type == "right_index" %}selected{% endif %}>Right Index</option>
+                <option value="right_middle" {% if request.form.fingerprint1_type == "right_middle" %}selected{% endif %}>Right Middle</option>
+                <option value="right_ring" {% if request.form.fingerprint1_type == "right_ring" %}selected{% endif %}>Right Ring</option>
+                <option value="right_little" {% if request.form.fingerprint1_type == "right_little" %}selected{% endif %}>Right Little</option>
+                <option value="left_thumb" {% if request.form.fingerprint1_type == "left_thumb" %}selected{% endif %}>Left Thumb</option>
+                <option value="left_index" {% if request.form.fingerprint1_type == "left_index" %}selected{% endif %}>Left Index</option>
+                <option value="left_middle" {% if request.form.fingerprint1_type == "left_middle" %}selected{% endif %}>Left Middle</option>
+                <option value="left_ring" {% if request.form.fingerprint1_type == "left_ring" %}selected{% endif %}>Left Ring</option>
+                <option value="left_little" {% if request.form.fingerprint1_type == "left_little" %}selected{% endif %}>Left Little</option>
+            </select>
+            <img id="fingerprint1_image" src="" alt="Selected Fingerprint Image" class="fixed-size-img mb-4">
+            <label for="latent_fingerprint" class="form-label">Upload Latent Fingerprint:</label>
+            <input type="file" name="latent_fingerprint" class="form-input mb-4">
+            <button type="submit" name="match_fingerprints" class="button" onclick="showSpinner()">Match Fingerprints</button>
+        </form>
+        {% endif %}
         {% if similarity_score is not none %}
         <div class="mt-4">
             <h2 class="text-xl font-semibold">Similarity Score: {{ similarity_score }}</h2>

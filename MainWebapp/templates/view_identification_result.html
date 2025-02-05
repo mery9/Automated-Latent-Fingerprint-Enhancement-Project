@@ -14,7 +14,7 @@
         <div class="card">
             <div class="card-header">Uploaded Fingerprint</div>
             <div class="card-body">
-                <img src="{{ url_for('static', filename='uploads/' ~ log.uploaded_fingerprint) }}" alt="Uploaded Fingerprint" class="fixed-size-img mb-4">
+                <img src="{{ uploaded_fingerprint_url }}" alt="Uploaded Fingerprint" class="fixed-size-img mb-4">
             </div>
         </div>
         <div class="card mt-4">
@@ -31,7 +31,7 @@
                     <p><strong>Gender:</strong> {{ result.enrollment.gender }}</p>
                     <p><strong>Contact Info:</strong> {{ result.enrollment.contact_info }}</p>
                     <p><strong>Blood Type:</strong> {{ result.enrollment.blood_type }}</p>
-                    <img src="data:image/jpeg;base64,{{ result.enrollment['fingerprints_' + result.fingerprint_type] }}" alt="Enrollment Fingerprint Image" class="w-60 h-60 border border-gray-300 rounded mb-4 fixed-size-img">
+                    <img src="{{ result.fingerprint_image_url }}" alt="Enrollment Fingerprint Image" class="w-60 h-60 border border-gray-300 rounded mb-4 fixed-size-img">
                 </div>
                 {% endfor %}
             </div>

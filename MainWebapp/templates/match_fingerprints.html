@@ -6,51 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
-    <script>
-        function updateFingerprintImage(selectElement, imageElementId) {
-            const selectedOption = selectElement.options[selectElement.selectedIndex];
-            const fingerprintId = document.querySelector('input[name="fingerprint1_id"]').value;
-            const fingerprintType = selectedOption.value;
-            const imageElement = document.getElementById(imageElementId);
-
-            if (fingerprintId && fingerprintType) {
-                fetch(`/get_fingerprint_image/${fingerprintId}/${fingerprintType}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.image) {
-                            imageElement.src = `data:image/jpeg;base64,${data.image}`;
-                        } else {
-                            imageElement.src = '';
-                        }
-                    });
-            } else {
-                imageElement.src = '';
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const fingerprintTypeSelect = document.querySelector('select[name="fingerprint1_type"]');
-            if (fingerprintTypeSelect) {
-                updateFingerprintImage(fingerprintTypeSelect, 'fingerprint1_image');
-            }
-        });
-
-        function showSpinner() {
-            document.getElementById('spinner').style.display = 'block';
-        }
-    </script>
 </head>
 <body class="bg-gray-100 p-4 md:p-8">
     <div class="container bg-white p-4 md:p-8 rounded-lg shadow-lg">
         <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800">Match Fingerprints</h1>
         {% if role == "Forensic Expertise" %}
-        <form method="POST" class="mb-4">
-            <input type="text" name="user_id" placeholder="Enter User ID" value="{{ request.form.user_id }}" class="form-input w-full mb-2">
+        <form method="POST" enctype="multipart/form-data" class="mb-4">
+            <label for="user_id" class="form-label">Search User by ID:</label>
+            <input type="text" name="user_id" class="form-input mb-4" required>
             <button type="submit" name="search_user" class="button">Search User</button>
         </form>
         {% if user_data %}
-        <div class="card">
-            <div class="card-header">User Information</div>
+        <div class="card mb-4">
+            <div class="card-header">User Details</div>
             <div class="card-body">
                 <p><strong>User ID:</strong> {{ user_data.user_id }}</p>
                 <p><strong>First Name:</strong> {{ user_data.firstname }}</p>
@@ -60,30 +28,36 @@
                 <p><strong>Blood Type:</strong> {{ user_data.blood_type }}</p>
             </div>
         </div>
-        <form method="POST" enctype="multipart/form-data" class="mt-4">
+        <form method="POST" enctype="multipart/form-data" class="mb-4">
             <input type="hidden" name="fingerprint1_id" value="{{ user_data._id }}">
             <label for="fingerprint1_type" class="form-label">Select Fingerprint Type:</label>
-            <select name="fingerprint1_type" class="form-select mb-4" onchange="updateFingerprintImage(this, 'fingerprint1_image')">
-                <option value="right_thumb" {% if request.form.fingerprint1_type == "right_thumb" %}selected{% endif %}>Right Thumb</option>
-                <option value="right_index" {% if request.form.fingerprint1_type == "right_index" %}selected{% endif %}>Right Index</option>
-                <option value="right_middle" {% if request.form.fingerprint1_type == "right_middle" %}selected{% endif %}>Right Middle</option>
-                <option value="right_ring" {% if request.form.fingerprint1_type == "right_ring" %}selected{% endif %}>Right Ring</option>
-                <option value="right_little" {% if request.form.fingerprint1_type == "right_little" %}selected{% endif %}>Right Little</option>
-                <option value="left_thumb" {% if request.form.fingerprint1_type == "left_thumb" %}selected{% endif %}>Left Thumb</option>
-                <option value="left_index" {% if request.form.fingerprint1_type == "left_index" %}selected{% endif %}>Left Index</option>
-                <option value="left_middle" {% if request.form.fingerprint1_type == "left_middle" %}selected{% endif %}>Left Middle</option>
-                <option value="left_ring" {% if request.form.fingerprint1_type == "left_ring" %}selected{% endif %}>Left Ring</option>
-                <option value="left_little" {% if request.form.fingerprint1_type == "left_little" %}selected{% endif %}>Left Little</option>
+            <select name="fingerprint1_type" class="form-select mb-4" required>
+                {% for fingerprint_type in available_fingerprint_types %}
+                    <option value="{{ fingerprint_type }}">{{ fingerprint_type.replace('_', ' ').title() }}</option>
+                {% endfor %}
             </select>
-            <img id="fingerprint1_image" src="" alt="Selected Fingerprint Image" class="fixed-size-img mb-4">
+            {% if fingerprint_image_urls %}
+            <div class="card mt-4">
+                <div class="card-header">Fingerprint Images</div>
+                <div class="card-body">
+                    {% for fingerprint_type, image_url in fingerprint_image_urls.items() %}
+                        <h4 class="text-lg font-semibold mb-2">{{ fingerprint_type.replace('_', ' ').title() }}</h4>
+                        <img src="{{ image_url }}" alt="Fingerprint Image" class="fixed-size-img mb-4">
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
             <label for="latent_fingerprint" class="form-label">Upload Latent Fingerprint:</label>
-            <input type="file" name="latent_fingerprint" class="form-input mb-4">
-            <button type="submit" name="match_fingerprints" class="button" onclick="showSpinner()">Match Fingerprints</button>
+            <input type="file" name="latent_fingerprint" class="form-input mb-4" required>
+            <button type="submit" name="match_fingerprints" class="button">Match Fingerprints</button>
         </form>
         {% endif %}
-        {% if similarity_score is not none %}
-        <div class="mt-4">
-            <h2 class="text-xl font-semibold">Similarity Score: {{ similarity_score }}</h2>
+        {% if similarity_score %}
+        <div class="card mt-4">
+            <div class="card-header">Match Result</div>
+            <div class="card-body">
+                <p><strong>Similarity Score:</strong> {{ similarity_score }}</p>
+            </div>
         </div>
         {% endif %}
         {% else %}
@@ -91,6 +65,5 @@
         {% endif %}
         <a href="{{ url_for('main_page') }}" class="button mt-4">Back to Main Page</a>
     </div>
-    <div id="spinner" class="spinner"></div>
 </body>
 </html>

@@ -370,9 +370,9 @@ def process_identification(log_id, uploaded_fingerprint_id, username):
                     if os.path.exists(fingerprint2_path):
                         os.remove(fingerprint2_path)
 
-        # Sort results by similarity score in descending order and take top 20
+        # Sort results by similarity score in descending order and take top 10
         results.sort(key=lambda x: x["similarity_score"], reverse=True)
-        results = results[:20]
+        results = results[:10]
 
         # Update the log entry with the results
         identification_results_collection.update_one(
@@ -440,7 +440,7 @@ def view_identification_result(log_id):
     enrollments = []
 
     for result in results:
-        enrollment = enrollments_collection.find_one({"_id": ObjectId(result["user_id"])})
+        enrollment = enrollments_collection.find_one({"user_id": result["user_id"]})
         if enrollment:
             fingerprint_key = f"fingerprints_{result['fingerprint_type']}"
             if fingerprint_key in enrollment:
@@ -452,9 +452,12 @@ def view_identification_result(log_id):
                     "enrollment": enrollment,
                     "fingerprint_image_url": fingerprint_image_url
                 })
+                print(f"Added fingerprint image URL: {fingerprint_image_url}")
 
     uploaded_fingerprint_id = log.get("uploaded_fingerprint")
     uploaded_fingerprint_url = url_for('serve_image', file_id=uploaded_fingerprint_id)
+    print(f"Uploaded fingerprint URL: {uploaded_fingerprint_url}")
+    print(f"Enrollments: {enrollments}")
     return render_template("view_identification_result.html", log=log, enrollments=enrollments, role=session["role"], uploaded_fingerprint_url=uploaded_fingerprint_url)
 
 # Route: Get Latent Fingerprint Image

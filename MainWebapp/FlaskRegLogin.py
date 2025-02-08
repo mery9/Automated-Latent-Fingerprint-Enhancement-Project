@@ -130,7 +130,9 @@ def enrollment():
         gender = data.get("gender")
         contact_info = data.get("contact_info")
         blood_type = data.get("blood_type")
+        fingerprint_capture_date = data.get("fingerprint_capture_date")
         user_id = session["user_id"] if session["role"] == "Citizen" else data.get("user_id")
+        username = session["username"]
         
         # Check if the user already has enrollment data
         if session["role"] == "Citizen" and enrollments_collection.find_one({"user_id": user_id}):
@@ -160,11 +162,13 @@ def enrollment():
 
         enrollment_data = {
             "user_id": user_id,
+            "username": username,
             "firstname": firstname,
             "lastname": lastname,
             "gender": gender,
             "contact_info": contact_info,
             "blood_type": blood_type,
+            "fingerprint_capture_date": fingerprint_capture_date,
             **fingerprints,
             "approved": False if session["role"] == "Citizen" else True
         }
@@ -209,15 +213,15 @@ def view_enrollment(user_id):
             fingerprint_type = key.replace("fingerprints_", "")
             fingerprint_image_urls[fingerprint_type] = url_for('serve_image', file_id=enrollment[key])
 
-    if request.method == "POST" and not enrollment["approved"]:
+    if request.method == "POST":
         if "approve" in request.form:
             enrollments_collection.update_one({"user_id": user_id}, {"$set": {"approved": True}})
             log_action(session["username"], f"Approved enrollment for user {user_id}")
             return render_template("success.html", message="Enrollment approved.", back_url=url_for("view_approved_enrollments"))
         elif "disapprove" in request.form:
-            enrollments_collection.update_one({"user_id": user_id}, {"$set": {"approved": False}})
-            log_action(session["username"], f"Disapproved enrollment for user {user_id}")
-            return render_template("success.html", message="Enrollment disapproved.", back_url=url_for("view_approved_enrollments"))
+            enrollments_collection.delete_one({"user_id": user_id})
+            log_action(session["username"], f"Disapproved and deleted enrollment for user {user_id}")
+            return render_template("success.html", message="Enrollment disapproved and deleted.", back_url=url_for("view_approved_enrollments"))
 
     return render_template("view_enrollment.html", enrollment=enrollment, fingerprint_image_urls=fingerprint_image_urls)
 

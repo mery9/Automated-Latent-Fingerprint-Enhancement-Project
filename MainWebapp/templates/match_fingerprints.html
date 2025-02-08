@@ -61,7 +61,7 @@
                             {{ fingerprint_type.replace('_', ' ').title() }}
                         </h4>
                         <img src="{{ image_url }}" alt="Fingerprint Image" 
-                             class="w-[300px] h-[200px] object-cover border border-gray-300 rounded mx-auto">
+                             class="object-cover border border-gray-300 rounded mx-auto">
                     </div>
                     {% endfor %}
                 </div>
@@ -76,7 +76,7 @@
             </div>
 
             <button type="submit" name="match_fingerprints" 
-                    class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors w-full">
+                    class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-800 transition-colors w-full">
                 Match Fingerprints
             </button>
         </form>

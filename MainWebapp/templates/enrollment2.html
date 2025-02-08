@@ -20,29 +20,6 @@
                 }
             });
         }
-
-        document.addEventListener("DOMContentLoaded", function () {
-        const dateInput = document.querySelector("input[name='fingerprint_capture_date']");
-        
-        dateInput.addEventListener("input", function (e) {
-            let value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
-            
-            if (value.length > 8) {
-                value = value.substring(0, 8); // Limit to 8 characters (ddmmyyyy)
-            }
-            
-            let formattedValue = "";
-            if (value.length > 4) {
-                formattedValue = `${value.substring(0, 2)}/${value.substring(2, 4)}/${value.substring(4)}`;
-            } else if (value.length > 2) {
-                formattedValue = `${value.substring(0, 2)}/${value.substring(2)}`;
-            } else {
-                formattedValue = value;
-            }
-            
-            e.target.value = formattedValue;
-        });
-    });
     </script>
 </head>
 <body class="bg-gray-100 p-4 md:p-8">
@@ -96,14 +73,6 @@
                         <option value="O">O</option>
                         <option value="AB">AB</option>
                     </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Fingerprint Capture Date</label>
-                    <input type="text" name="fingerprint_capture_date" placeholder="dd/mm/yyyy" 
-                           pattern="(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}" 
-                           title="Enter date in dd/mm/yyyy format" required 
-                           class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
                 </div>
             </div>
 
@@ -220,22 +189,149 @@
                         <p class="text-center mt-2 text-sm font-medium">Right Hand</p>
                     </div>
                 </div>
+<!--
+                <!-- Fallback Inputs with Preview -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm">
+                    <!-- Left Hand Fallback Inputs -->
+                    <div>
+                        <label class="block text-xs font-medium mb-1">Left Thumb</label>
+                        <div class="relative">
+                            <input type="file" id="left-thumb-fallback" name="fingerprints_left_thumb" 
+                                   class="w-full text-xs border rounded opacity-0 absolute z-10 cursor-pointer"
+                                   onchange="document.getElementById('left-thumb-fallback-preview').textContent = this.files[0]?.name || ''">
+                            <div class="border rounded p-1 text-gray-500 truncate" 
+                                 onclick="document.getElementById('left-thumb-fallback').click()">
+                                <span id="left-thumb-fallback-preview">Click to upload</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1">Left Index</label>
+                        <div class="relative">
+                            <input type="file" id="left-index-fallback" name="fingerprints_left_index" 
+                                   class="w-full text-xs border rounded opacity-0 absolute z-10 cursor-pointer"
+                                   onchange="document.getElementById('left-index-fallback-preview').textContent = this.files[0]?.name || ''">
+                            <div class="border rounded p-1 text-gray-500 truncate" 
+                                 onclick="document.getElementById('left-index-fallback').click()">
+                                <span id="left-index-fallback-preview">Click to upload</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1">Left Middle</label>
+                        <div class="relative">
+                            <input type="file" id="left-middle-fallback" name="fingerprints_left_middle" 
+                                   class="w-full text-xs border rounded opacity-0 absolute z-10 cursor-pointer"
+                                   onchange="document.getElementById('left-middle-fallback-preview').textContent = this.files[0]?.name || ''">
+                            <div class="border rounded p-1 text-gray-500 truncate" 
+                                 onclick="document.getElementById('left-middle-fallback').click()">
+                                <span id="left-middle-fallback-preview">Click to upload</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1">Left Ring</label>
+                        <div class="relative">
+                            <input type="file" id="left-ring-fallback" name="fingerprints_left_ring" 
+                                   class="w-full text-xs border rounded opacity-0 absolute z-10 cursor-pointer"
+                                   onchange="document.getElementById('left-ring-fallback-preview').textContent = this.files[0]?.name || ''">
+                            <div class="border rounded p-1 text-gray-500 truncate" 
+                                 onclick="document.getElementById('left-ring-fallback').click()">
+                                <span id="left-ring-fallback-preview">Click to upload</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1">Left Little</label>
+                        <div class="relative">
+                            <input type="file" id="left-little-fallback" name="fingerprints_left_little" 
+                                   class="w-full text-xs border rounded opacity-0 absolute z-10 cursor-pointer"
+                                   onchange="document.getElementById('left-little-fallback-preview').textContent = this.files[0]?.name || ''">
+                            <div class="border rounded p-1 text-gray-500 truncate" 
+                                 onclick="document.getElementById('left-little-fallback').click()">
+                                <span id="left-little-fallback-preview">Click to upload</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right Hand Fallback Inputs -->
+                    <div>
+                        <label class="block text-xs font-medium mb-1">Right Thumb</label>
+                        <div class="relative">
+                            <input type="file" id="right-thumb-fallback" name="fingerprints_right_thumb" 
+                                   class="w-full text-xs border rounded opacity-0 absolute z-10 cursor-pointer"
+                                   onchange="document.getElementById('right-thumb-fallback-preview').textContent = this.files[0]?.name || ''">
+                            <div class="border rounded p-1 text-gray-500 truncate" 
+                                 onclick="document.getElementById('right-thumb-fallback').click()">
+                                <span id="right-thumb-fallback-preview">Click to upload</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1">Right Index</label>
+                        <div class="relative">
+                            <input type="file" id="right-index-fallback" name="fingerprints_right_index" 
+                                   class="w-full text-xs border rounded opacity-0 absolute z-10 cursor-pointer"
+                                   onchange="document.getElementById('right-index-fallback-preview').textContent = this.files[0]?.name || ''">
+                            <div class="border rounded p-1 text-gray-500 truncate" 
+                                 onclick="document.getElementById('right-index-fallback').click()">
+                                <span id="right-index-fallback-preview">Click to upload</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1">Right Middle</label>
+                        <div class="relative">
+                            <input type="file" id="right-middle-fallback" name="fingerprints_right_middle" 
+                                   class="w-full text-xs border rounded opacity-0 absolute z-10 cursor-pointer"
+                                   onchange="document.getElementById('right-middle-fallback-preview').textContent = this.files[0]?.name || ''">
+                            <div class="border rounded p-1 text-gray-500 truncate" 
+                                 onclick="document.getElementById('right-middle-fallback').click()">
+                                <span id="right-middle-fallback-preview">Click to upload</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1">Right Ring</label>
+                        <div class="relative">
+                            <input type="file" id="right-ring-fallback" name="fingerprints_right_ring" 
+                                   class="w-full text-xs border rounded opacity-0 absolute z-10 cursor-pointer"
+                                   onchange="document.getElementById('right-ring-fallback-preview').textContent = this.files[0]?.name || ''">
+                            <div class="border rounded p-1 text-gray-500 truncate" 
+                                 onclick="document.getElementById('right-ring-fallback').click()">
+                                <span id="right-ring-fallback-preview">Click to upload</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1">Right Little</label>
+                        <div class="relative">
+                            <input type="file" id="right-little-fallback" name="fingerprints_right_little" 
+                                   class="w-full text-xs border rounded opacity-0 absolute z-10 cursor-pointer"
+                                   onchange="document.getElementById('right-little-fallback-preview').textContent = this.files[0]?.name || ''">
+                            <div class="border rounded p-1 text-gray-500 truncate" 
+                                 onclick="document.getElementById('right-little-fallback').click()">
+                                <span id="right-little-fallback-preview">Click to upload</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            
+            <button type="submit" 
+                    class="w-full bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium">
+                Submit Enrollment
+            </button>
+        </form>
 
-                <button type="submit" 
-                        class="w-full bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium">
-                    Submit Enrollment
-                </button>
-            </form>
-
-            <div class="mt-6 text-center">
-                <a href="{{ url_for('main_page') }}" 
-                   class="text-blue-500 hover:text-blue-600 text-sm font-medium inline-flex items-center">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                    </svg>
-                    Back to Main Page
-                </a>
-            </div>
+        <div class="mt-6 text-center">
+            <a href="{{ url_for('main_page') }}" 
+               class="text-blue-500 hover:text-blue-600 text-sm font-medium inline-flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Main Page
+            </a>
         </div>
-    </body>
+    </div>
+</body>
 </html>

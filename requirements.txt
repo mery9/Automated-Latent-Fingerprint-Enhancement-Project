@@ -11,3 +11,9 @@ python-dotenv==0.19.1
 Flask-SocketIO==5.5.1
 celery==5.4.0
 redis==5.2.1
+torch >= 1.10
+opencv-python >= 4.5.3.56
+scipy >= 1.6.0
+mat73
+torchvision
+tensorboard

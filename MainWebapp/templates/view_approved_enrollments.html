@@ -4,23 +4,64 @@
     <title>View Approved Enrollments</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-gray-100 p-4 md:p-8">
-    <div class="container bg-white p-4 md:p-8 rounded-lg shadow-lg">
-        <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800">Approved Enrollments</h1>
-        <div class="responsive-list">
-            <ul class="list-disc list-inside">
+    <div class="max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-lg shadow-lg">
+        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center text-gray-800">Approved Enrollments</h1>
+        
+        <div class="overflow-x-auto">
+            <!-- Desktop Table -->
+            <div class="hidden md:block">
+                <table class="w-full">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Name</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">User ID</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for enrollment in enrollments %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-gray-600">{{ enrollment.firstname }} {{ enrollment.lastname }}</td>
+                            <td class="px-4 py-3 text-gray-600">{{ enrollment.user_id }}</td>
+                            <td class="px-4 py-3">
+                                <a href="{{ url_for('view_enrollment', user_id=enrollment.user_id) }}" 
+                                   class="text-blue-500 hover:text-blue-600 font-medium">
+                                    View Details
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile List -->
+            <div class="block md:hidden space-y-4">
                 {% for enrollment in enrollments %}
-                <li class="mb-4">
-                    <a href="{{ url_for('view_enrollment', user_id=enrollment.user_id) }}" class="text-blue-500 hover:text-blue-700">
-                        {{ enrollment.firstname }} {{ enrollment.lastname }} (User ID: {{ enrollment.user_id }})
+                <div class="border border-gray-200 p-4 rounded-lg hover:bg-gray-100 transition-colors">
+                    <h3 class="font-medium text-gray-700">{{ enrollment.firstname }} {{ enrollment.lastname }}</h3>
+                    <p class="text-gray-600 text-sm mt-1">User ID: {{ enrollment.user_id }}</p>
+                    <a href="{{ url_for('view_enrollment', user_id=enrollment.user_id) }}" 
+                       class="inline-block mt-2 text-blue-500 hover:text-blue-600 text-sm font-medium">
+                        View Details →
                     </a>
-                </li>
+                </div>
                 {% endfor %}
-            </ul>
+            </div>
         </div>
-        <a href="{{ url_for('main_page') }}" class="button">Back to Main Page</a>
+
+        <div class="mt-6 text-center">
+            <a href="{{ url_for('main_page') }}" 
+               class="inline-flex items-center text-blue-500 hover:text-blue-600 text-sm font-medium">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Main Page
+            </a>
+        </div>
     </div>
 </body>
 </html>

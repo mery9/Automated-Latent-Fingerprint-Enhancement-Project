@@ -337,7 +337,8 @@ def enhance_fingerprint():
     if request.method == "POST":
         if "fingerprint_photos" in request.files:
             files = request.files.getlist("fingerprint_photos")
-            upload_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'enhance_input')
+            unique_id = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
+            upload_folder = os.path.join(app.config['UPLOAD_FOLDER'], f'enhance_input_{unique_id}')
             os.makedirs(upload_folder, exist_ok=True)
 
             for file in files:
@@ -355,14 +356,14 @@ def enhance_fingerprint():
             }).inserted_id
 
             # Start the background process
-            threading.Thread(target=process_enhancement, args=(log_id, upload_folder, session["username"])).start()
+            threading.Thread(target=process_enhancement, args=(log_id, upload_folder, session["username"], unique_id)).start()
             return render_template("success.html", message="Enhancement process started. You can check the results in the enhancement logs.", back_url=url_for("view_enhancement_logs"))
 
     return render_template("enhance_fingerprint.html", role=session["role"])
 
 # Function to process enhancement in the background
-def process_enhancement(log_id, upload_folder, username):
-    output_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'enhance_output')
+def process_enhancement(log_id, upload_folder, username, unique_id):
+    output_folder = os.path.join(app.config['UPLOAD_FOLDER'], f'enhance_output_{unique_id}')
     os.makedirs(output_folder, exist_ok=True)
     results = []
 
@@ -389,8 +390,10 @@ def process_enhancement(log_id, upload_folder, username):
 
     finally:
         # Clean up input and output folders
-        shutil.rmtree(upload_folder)
-        shutil.rmtree(output_folder)
+        if os.path.exists(upload_folder):
+            shutil.rmtree(upload_folder)
+        if os.path.exists(output_folder):
+            shutil.rmtree(output_folder)
 
 # Route: View Enhancement Logs
 @app.route("/view_enhancement_logs", methods=["GET", "POST"])

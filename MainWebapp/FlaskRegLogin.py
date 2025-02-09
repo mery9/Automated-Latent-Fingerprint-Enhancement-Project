@@ -8,6 +8,8 @@ import os
 import datetime
 import subprocess
 import threading
+import shutil
+from LatentEnhancement.experiment.latent_fingerprint_enhancement import TestNetwork
 
 # Load environment variables
 load_dotenv()
@@ -22,6 +24,7 @@ logs_collection = db.logs
 images_collection = db.images
 latent_fingerprints_collection = db.latent_fingerprints_images
 identification_results_collection = db.identification_results
+enhanced_images_collection = db.enhanced_images
 fs = gridfs.GridFS(db)
 
 # Flask app setup
@@ -130,9 +133,7 @@ def enrollment():
         gender = data.get("gender")
         contact_info = data.get("contact_info")
         blood_type = data.get("blood_type")
-        fingerprint_capture_date = data.get("fingerprint_capture_date")
         user_id = session["user_id"] if session["role"] == "Citizen" else data.get("user_id")
-        username = session["username"]
         
         # Check if the user already has enrollment data
         if session["role"] == "Citizen" and enrollments_collection.find_one({"user_id": user_id}):
@@ -162,13 +163,11 @@ def enrollment():
 
         enrollment_data = {
             "user_id": user_id,
-            "username": username,
             "firstname": firstname,
             "lastname": lastname,
             "gender": gender,
             "contact_info": contact_info,
             "blood_type": blood_type,
-            "fingerprint_capture_date": fingerprint_capture_date,
             **fingerprints,
             "approved": False if session["role"] == "Citizen" else True
         }
@@ -213,15 +212,15 @@ def view_enrollment(user_id):
             fingerprint_type = key.replace("fingerprints_", "")
             fingerprint_image_urls[fingerprint_type] = url_for('serve_image', file_id=enrollment[key])
 
-    if request.method == "POST":
+    if request.method == "POST" and not enrollment["approved"]:
         if "approve" in request.form:
             enrollments_collection.update_one({"user_id": user_id}, {"$set": {"approved": True}})
             log_action(session["username"], f"Approved enrollment for user {user_id}")
             return render_template("success.html", message="Enrollment approved.", back_url=url_for("view_approved_enrollments"))
         elif "disapprove" in request.form:
-            enrollments_collection.delete_one({"user_id": user_id})
-            log_action(session["username"], f"Disapproved and deleted enrollment for user {user_id}")
-            return render_template("success.html", message="Enrollment disapproved and deleted.", back_url=url_for("view_approved_enrollments"))
+            enrollments_collection.update_one({"user_id": user_id}, {"$set": {"approved": False}})
+            log_action(session["username"], f"Disapproved enrollment for user {user_id}")
+            return render_template("success.html", message="Enrollment disapproved.", back_url=url_for("view_approved_enrollments"))
 
     return render_template("view_enrollment.html", enrollment=enrollment, fingerprint_image_urls=fingerprint_image_urls)
 
@@ -328,6 +327,94 @@ def match_fingerprints():
                             os.remove(latent_fingerprint_path)
 
     return render_template("match_fingerprints.html", user_data=user_data, similarity_score=similarity_score, fingerprint_image_urls=fingerprint_image_urls, available_fingerprint_types=available_fingerprint_types, role=session["role"])
+
+# Route: Enhance Fingerprint
+@app.route("/enhance_fingerprint", methods=["GET", "POST"])
+def enhance_fingerprint():
+    if "username" not in session or session["role"] != "Forensic Expertise":
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        if "fingerprint_photos" in request.files:
+            files = request.files.getlist("fingerprint_photos")
+            upload_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'enhance_input')
+            os.makedirs(upload_folder, exist_ok=True)
+
+            for file in files:
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(upload_folder, filename)
+                file.save(file_path)
+
+            # Create a log entry with "processing" status
+            log_id = enhanced_images_collection.insert_one({
+                "user": session["username"],
+                "files": [file.filename for file in files],
+                "results": [],
+                "status": "processing",
+                "timestamp": datetime.datetime.now()
+            }).inserted_id
+
+            # Start the background process
+            threading.Thread(target=process_enhancement, args=(log_id, upload_folder, session["username"])).start()
+            return render_template("success.html", message="Enhancement process started. You can check the results in the enhancement logs.", back_url=url_for("view_enhancement_logs"))
+
+    return render_template("enhance_fingerprint.html", role=session["role"])
+
+# Function to process enhancement in the background
+def process_enhancement(log_id, upload_folder, username):
+    output_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'enhance_output')
+    os.makedirs(output_folder, exist_ok=True)
+    results = []
+
+    try:
+        # Run the enhancement tool
+        test_network = TestNetwork()
+        test_network.args.latent_fingerprint_dir = upload_folder
+        test_network.args.out_dir = output_folder
+        test_network.run_test()
+
+        # Collect enhanced images and save to database
+        for filename in os.listdir(upload_folder):
+            enhanced_file_path = os.path.join(output_folder, filename)
+            if os.path.exists(enhanced_file_path):
+                with open(enhanced_file_path, "rb") as f:
+                    file_id = fs.put(f, filename=filename)
+                    results.append(file_id)
+
+        # Update the log entry with the results
+        enhanced_images_collection.update_one(
+            {"_id": ObjectId(log_id)},
+            {"$set": {"results": results, "status": "completed"}}
+        )
+
+    finally:
+        # Clean up input and output folders
+        shutil.rmtree(upload_folder)
+        shutil.rmtree(output_folder)
+
+# Route: View Enhancement Logs
+@app.route("/view_enhancement_logs", methods=["GET", "POST"])
+def view_enhancement_logs():
+    if "username" not in session or session["role"] != "Forensic Expertise":
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        log_id = request.form.get("log_id")
+        if log_id:
+            enhanced_images_collection.delete_one({"_id": ObjectId(log_id)})
+            return redirect(url_for("view_enhancement_logs"))
+
+    logs = list(enhanced_images_collection.find({"user": session["username"]}).sort("timestamp", -1))
+    return render_template("view_enhancement_logs.html", logs=logs, role=session["role"])
+
+# Route: Download Enhanced Image
+@app.route("/download_enhanced_image/<file_id>")
+def download_enhanced_image(file_id):
+    try:
+        file = fs.get(ObjectId(file_id))
+        return send_file(file, mimetype='image/jpeg', as_attachment=True, download_name=file.filename)
+    except Exception as e:
+        return str(e)
 
 # Function to process identification in the background
 def process_identification(log_id, uploaded_fingerprint_id, username):
@@ -552,6 +639,27 @@ def view_logs():
         log["timestamp"] = log["timestamp"].strftime("%Y-%m-%dT%H:%M:%S")
     
     return render_template("view_logs.html", logs=logs, page=page, total_pages=total_pages, search_query=search_query)
+
+# Route: View Enhancement Result
+@app.route("/view_enhancement_result/<log_id>")
+def view_enhancement_result(log_id):
+    if "username" not in session or session["role"] != "Forensic Expertise":
+        return redirect(url_for("login"))
+
+    log = enhanced_images_collection.find_one({"_id": ObjectId(log_id)})
+    if not log:
+        return render_template("error.html", message="Log not found.", back_url=url_for("view_enhancement_logs"))
+
+    results = log.get("results", [])
+    enhanced_images = []
+
+    for result in results:
+        file_id = result
+        file = fs.get(file_id)
+        file_url = url_for('serve_image', file_id=file_id)
+        enhanced_images.append((file_url, file.filename))
+
+    return render_template("view_enhancement_result.html", log=log, enhanced_images=enhanced_images, role=session["role"])
 
 # Route: Logout
 @app.route("/logout")

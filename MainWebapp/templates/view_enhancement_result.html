@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Enhancement Result</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .modal-content {
+            margin: 15% auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 md:p-8">
+    <div class="bg-white p-4 md:p-8 rounded-lg shadow-lg max-w-4xl mx-auto">
+        <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800">Enhancement Result</h1>
+        {% if role == "Forensic Expertise" %}
+        <div class="border border-gray-300 rounded-lg p-4 mb-4">
+            <h2 class="text-xl font-semibold mb-2">Enhanced Images</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for image, filename in enhanced_images %}
+                <div class="border rounded-lg p-4">
+                    <h3 class="text-lg font-semibold mb-2">{{ filename }}</h3>
+                    <img src="{{ image }}" alt="Enhanced Fingerprint" class="object-contain border rounded-md mx-auto mb-4 cursor-pointer" onclick="openModal('{{ image }}')">
+                    <a href="{{ image }}" download class="block bg-green-500 text-white text-center px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
+                        Download
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <p class="text-red-500 text-center font-semibold">Access Denied. This page is only accessible to users with the Forensic Expertise role.</p>
+        {% endif %}
+        <div class="text-center mt-4">
+            <a href="{{ url_for('view_enhancement_logs') }}" class="inline-block bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600">Back to Logs</a>
+        </div>
+    </div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="img01">
+    </div>
+
+    <script>
+        function openModal(src) {
+            var modal = document.getElementById("myModal");
+            var modalImg = document.getElementById("img01");
+            modal.style.display = "block";
+            modalImg.src = src;
+        }
+
+        function closeModal() {
+            var modal = document.getElementById("myModal");
+            modal.style.display = "none";
+        }
+
+        // Close the modal when clicking outside the image
+        window.onclick = function(event) {
+            var modal = document.getElementById("myModal");
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

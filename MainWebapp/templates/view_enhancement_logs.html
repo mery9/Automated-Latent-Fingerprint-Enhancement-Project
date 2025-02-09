@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Enhancement Logs</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-100 p-4 md:p-8 min-h-screen">
+    <div class="max-w-6xl bg-white p-4 md:p-6 rounded-lg shadow-lg mx-auto">
+        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center text-gray-800">Enhancement Logs</h1>
+        
+        {% if role == "Forensic Expertise" %}
+        <div class="overflow-x-auto">
+            <!-- Desktop Table -->
+            <div class="hidden md:block">
+                <table class="w-full">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 rounded-tl-lg">Log ID</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Timestamp</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 rounded-tr-lg">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for log in logs %}
+                        <tr class="{% if loop.index is even %}bg-gray-50{% else %}bg-white{% endif %} hover:bg-gray-100">
+                            <td class="px-4 py-3 text-sm text-gray-600">{{ log._id }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-600">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td class="px-4 py-3">
+                                <div class="flex items-center gap-2">
+                                    {% if log.status == "processing" %}
+                                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full">
+                                            Processing...
+                                        </span>
+                                    {% else %}
+                                        <a href="{{ url_for('view_enhancement_result', log_id=log._id) }}" 
+                                           class="bg-blue-500 text-white px-3 py-1.5 text-sm rounded-md hover:bg-blue-600 transition-colors">
+                                            View Result
+                                        </a>
+                                    {% endif %}
+                                    <form method="POST" class="inline-block">
+                                        <input type="hidden" name="log_id" value="{{ log._id }}">
+                                        <button type="submit" 
+                                                class="bg-red-500 text-white px-3 py-1.5 text-sm rounded-md hover:bg-red-600 transition-colors">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Cards -->
+            <div class="block md:hidden space-y-3">
+                {% for log in logs %}
+                <div class="border border-gray-200 p-3 rounded-lg bg-white shadow-sm">
+                    <div class="space-y-1 mb-2">
+                        <p class="text-sm font-medium text-gray-700">Log ID: 
+                            <span class="font-normal text-gray-600">{{ log._id }}</span>
+                        </p>
+                        <p class="text-sm font-medium text-gray-700">Timestamp: 
+                            <span class="font-normal text-gray-600">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                        </p>
+                    </div>
+                    <div class="space-y-2">
+                        {% if log.status == "processing" %}
+                            <span class="inline-block w-full px-3 py-2 bg-yellow-100 text-yellow-800 text-sm rounded-md text-center">
+                                Processing...
+                            </span>
+                        {% else %}
+                            <a href="{{ url_for('view_enhancement_result', log_id=log._id) }}" 
+                               class="block w-full bg-blue-500 text-white px-4 py-2 text-sm rounded-md hover:bg-blue-600 transition-colors text-center">
+                                View Result
+                            </a>
+                        {% endif %}
+                        <form method="POST">
+                            <input type="hidden" name="log_id" value="{{ log._id }}">
+                            <button type="submit" 
+                                    class="block w-full bg-red-500 text-white px-4 py-2 text-sm rounded-md hover:bg-red-600 transition-colors">
+                                Delete Log
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <p class="text-red-500 text-center p-4 bg-red-50 rounded-lg font-medium mt-4">
+            Access Denied. Requires Forensic Expertise role.
+        </p>
+        {% endif %}
+
+        <div class="mt-6 flex justify-center">
+            <a href="{{ url_for('enhance_fingerprint') }}" 
+               class="bg-gray-200 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-300 transition-colors text-sm md:text-base">
+                Back to Enhance Fingerprint
+            </a>
+        </div>
+    </div>
+</body>
+</html>

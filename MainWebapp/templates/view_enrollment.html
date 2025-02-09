@@ -5,6 +5,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .modal-content {
+            margin: 15% auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body class="bg-gray-100 p-4 md:p-8">
     <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6 md:p-8">
@@ -35,7 +69,7 @@
                                 {{ fingerprint_type.replace('_', ' ').title() }}
                             </h4>
                             <img src="{{ photo_url }}" alt="Fingerprint Photo" 
-                                 class="object-contain border rounded-md mx-auto">
+                                 class="object-contain border rounded-md mx-auto cursor-pointer" onclick="openModal('{{ photo_url }}')">
                         </div>
                         {% endif %}
                     {% endfor %}
@@ -50,7 +84,7 @@
                                 {{ fingerprint_type.replace('_', ' ').title() }}
                             </h4>
                             <img src="{{ photo_url }}" alt="Fingerprint Photo" 
-                                 class="object-contain border rounded-md mx-auto">
+                                 class="object-contain border rounded-md mx-auto cursor-pointer" onclick="openModal('{{ photo_url }}')">
                         </div>
                         {% endif %}
                     {% endfor %}
@@ -81,5 +115,33 @@
             </a>
         </div>
     </div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="img01">
+    </div>
+
+    <script>
+        function openModal(src) {
+            var modal = document.getElementById("myModal");
+            var modalImg = document.getElementById("img01");
+            modal.style.display = "block";
+            modalImg.src = src;
+        }
+
+        function closeModal() {
+            var modal = document.getElementById("myModal");
+            modal.style.display = "none";
+        }
+
+        // Close the modal when clicking outside the image
+        window.onclick = function(event) {
+            var modal = document.getElementById("myModal");
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
 </body>
 </html>

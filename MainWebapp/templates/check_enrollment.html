@@ -1,69 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Check Enrollment</title>
     <meta charset="UTF-8">
+    <title>Check Enrollment Data</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-gray-100 p-4 md:p-8">
-    <div class="max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-lg shadow-lg">
-        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center text-gray-800">Check Enrollment Data</h1>
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-6">
+            Check Enrollment Data
+        </h1>
         
-        <div class="overflow-x-auto">
-            <!-- Desktop Table -->
-            <div class="hidden md:block">
-                <table class="w-full">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">User ID</th>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Full Name</th>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        {% for enrollment in enrollments %}
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-gray-600">{{ enrollment.user_id }}</td>
-                            <td class="px-4 py-3 text-gray-600">{{ enrollment.firstname }} {{ enrollment.lastname }}</td>
-                            <td class="px-4 py-3">
-                                <a href="{{ url_for('view_enrollment', user_id=enrollment.user_id) }}" 
-                                   class="text-blue-500 hover:text-blue-600 font-medium">
-                                    View Details
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Mobile List -->
-            <div class="block md:hidden space-y-4">
-                {% for enrollment in enrollments %}
-                <div class="border border-gray-200 p-4 rounded-lg hover:bg-gray-100 transition-colors">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h3 class="font-medium text-gray-700">{{ enrollment.user_id }}</h3>
-                            <p class="text-gray-600">{{ enrollment.firstname }} {{ enrollment.lastname }}</p>
-                        </div>
-                        <a href="{{ url_for('view_enrollment', user_id=enrollment.user_id) }}" 
-                           class="text-blue-500 hover:text-blue-600">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                            </svg>
-                        </a>
-                    </div>
+        <!-- Responsive Enrollment Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% for enrollment in enrollments %}
+            <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                <div>
+                    <p class="text-lg font-semibold text-gray-800">
+                        {{ enrollment.firstname }} {{ enrollment.lastname }}
+                    </p>
+                    <p class="text-gray-600 text-sm">
+                        User ID: {{ enrollment.user_id }}
+                    </p>
                 </div>
-                {% endfor %}
+                <div class="mt-3">
+                    <a href="{{ url_for('view_enrollment', user_id=enrollment.user_id) }}" 
+                       class="block text-center bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded">
+                        View Details
+                    </a>
+                </div>
             </div>
+            {% endfor %}
         </div>
-
+        
+        <!-- Back to Main Page Button -->
         <div class="mt-6 text-center">
             <a href="{{ url_for('main_page') }}" 
-               class="text-blue-500 hover:text-blue-600 text-sm font-medium inline-flex items-center">
+               class="inline-flex items-center text-blue-500 hover:text-blue-600 text-sm font-medium">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>
                 Back to Main Page
             </a>

@@ -20,6 +20,7 @@ Before you begin, ensure you have the following installed on your system:
 - Java 11
 - MongoDB
 - Maven
+- Nvidia CUDA 
 
 ## Installation
 

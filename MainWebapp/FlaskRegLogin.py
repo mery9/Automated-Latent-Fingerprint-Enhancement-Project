@@ -103,6 +103,7 @@ def login():
             session["user_id"] = str(user["_id"])
             session["username"] = username
             session["role"] = user["role"]
+            log_action(username, "Logged in")
             return redirect(url_for("main_page"))  # Redirect to the main page
         return render_template("error.html", message="Invalid credentials.", back_url=url_for("login"))
 
@@ -222,6 +223,7 @@ def view_enrollment(user_id):
             log_action(session["username"], f"Disapproved enrollment for user {user_id}")
             return render_template("success.html", message="Enrollment disapproved.", back_url=url_for("view_approved_enrollments"))
 
+    log_action(session["username"], f"Viewed enrollment details for user {user_id}")
     return render_template("view_enrollment.html", enrollment=enrollment, fingerprint_image_urls=fingerprint_image_urls)
 
 # Route: View Approved Enrollments
@@ -231,6 +233,7 @@ def view_approved_enrollments():
         return redirect(url_for("login"))
 
     enrollments = enrollments_collection.find({"approved": True})
+    log_action(session["username"], "Viewed approved enrollments")
     return render_template("view_approved_enrollments.html", enrollments=enrollments)
 
 # Route: Enhance Latent Fingerprint
@@ -271,6 +274,7 @@ def match_fingerprints():
             user_id = request.form.get("user_id")
             user_data = enrollments_collection.find_one({"user_id": user_id})
             if not user_data:
+                log_action(session["username"], f"User not found for matching fingerprints: {user_id}")
                 return render_template("error.html", message="User not found.", back_url=url_for("match_fingerprints"))
 
             # Get available fingerprint types and their image URLs for the user
@@ -326,6 +330,7 @@ def match_fingerprints():
                         if os.path.exists(latent_fingerprint_path):
                             os.remove(latent_fingerprint_path)
 
+    log_action(session["username"], "Accessed match fingerprints page")
     return render_template("match_fingerprints.html", user_data=user_data, similarity_score=similarity_score, fingerprint_image_urls=fingerprint_image_urls, available_fingerprint_types=available_fingerprint_types, role=session["role"])
 
 # Route: Enhance Fingerprint
@@ -405,9 +410,11 @@ def view_enhancement_logs():
         log_id = request.form.get("log_id")
         if log_id:
             enhanced_images_collection.delete_one({"_id": ObjectId(log_id)})
+            log_action(session["username"], f"Deleted enhancement log {log_id}")
             return redirect(url_for("view_enhancement_logs"))
 
     logs = list(enhanced_images_collection.find({"user": session["username"]}).sort("timestamp", -1))
+    log_action(session["username"], "Viewed enhancement logs")
     return render_template("view_enhancement_logs.html", logs=logs, role=session["role"])
 
 # Route: Download Enhanced Image
@@ -415,8 +422,10 @@ def view_enhancement_logs():
 def download_enhanced_image(file_id):
     try:
         file = fs.get(ObjectId(file_id))
+        log_action(session["username"], f"Downloaded enhanced image {file_id}")
         return send_file(file, mimetype='image/jpeg', as_attachment=True, download_name=file.filename)
     except Exception as e:
+        log_action(session["username"], f"Failed to download enhanced image {file_id}: {str(e)}")
         return str(e)
 
 # Function to process identification in the background
@@ -474,6 +483,8 @@ def process_identification(log_id, uploaded_fingerprint_id, username):
             {"$set": {"results": results, "status": "completed"}}
         )
 
+        log_action(username, f"Processed identification for log {log_id}")
+
     finally:
         if os.path.exists(uploaded_fingerprint_path):
             os.remove(uploaded_fingerprint_path)
@@ -501,8 +512,10 @@ def identify_fingerprints():
 
             # Start the background process
             threading.Thread(target=process_identification, args=(log_id, file_id, session["username"])).start()
+            log_action(session["username"], f"Started identification process for log {log_id}")
             return render_template("success.html", message="Identification process started. You can check the results in the log.", back_url=url_for("identify_fingerprints"))
 
+    log_action(session["username"], "Accessed identify fingerprints page")
     return render_template("identify_fingerprints.html", role=session["role"])
 
 # Route: View Identification Logs
@@ -515,9 +528,11 @@ def view_identification_logs():
         log_id = request.form.get("log_id")
         if log_id:
             identification_results_collection.delete_one({"_id": ObjectId(log_id)})
+            log_action(session["username"], f"Deleted identification log {log_id}")
             return redirect(url_for("view_identification_logs"))
 
     logs = list(identification_results_collection.find({"user": session["username"]}).sort("timestamp", -1))
+    log_action(session["username"], "Viewed identification logs")
     return render_template("view_identification_logs.html", logs=logs, role=session["role"])
 
 # Route: View Identification Result
@@ -552,6 +567,7 @@ def view_identification_result(log_id):
     uploaded_fingerprint_url = url_for('serve_image', file_id=uploaded_fingerprint_id)
     print(f"Uploaded fingerprint URL: {uploaded_fingerprint_url}")
     print(f"Enrollments: {enrollments}")
+    log_action(session["username"], f"Viewed identification result for log {log_id}")
     return render_template("view_identification_result.html", log=log, enrollments=enrollments, role=session["role"], uploaded_fingerprint_url=uploaded_fingerprint_url)
 
 # Route: Get Latent Fingerprint Image
@@ -607,6 +623,7 @@ def manage_users():
         log_action(session["username"], f"Updated user {user_id} role to {new_role} and approval status to {new_approval_status}")
 
     users = list(users_collection.find(query))
+    log_action(session["username"], "Viewed and managed users")
     return render_template("manage_users.html", users=users, search_query=search_query)
 
 # Route: View Logs
@@ -641,6 +658,7 @@ def view_logs():
     for log in logs:
         log["timestamp"] = log["timestamp"].strftime("%Y-%m-%dT%H:%M:%S")
     
+    log_action(session["username"], "Viewed logs")
     return render_template("view_logs.html", logs=logs, page=page, total_pages=total_pages, search_query=search_query)
 
 # Route: View Enhancement Result
@@ -662,13 +680,17 @@ def view_enhancement_result(log_id):
         file_url = url_for('serve_image', file_id=file_id)
         enhanced_images.append((file_url, file.filename))
 
+    log_action(session["username"], f"Viewed enhancement result for log {log_id}")
     return render_template("view_enhancement_result.html", log=log, enhanced_images=enhanced_images, role=session["role"])
 
 # Route: Logout
 @app.route("/logout")
 def logout():
+    username = session.get("username")
     session.clear()
+    if username:
+        log_action(username, "Logged out")
     return redirect(url_for("home"))
 
-if __name__ == "__main__":
+if __name__== "__main__":
     app.run(debug=True, host="0.0.0.0")

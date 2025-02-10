@@ -5,13 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <script>
+        function showSpinner() {
+            document.getElementById('spinner').classList.remove('hidden');
+        }
+    </script>
 </head>
-<body class="bg-gray-100 p-4 md:p-8">
+<body class="bg-gray-100 p-4 md:p-8 min-h-screen">
     <div class="max-w-2xl bg-white p-4 md:p-8 rounded-lg shadow-lg mx-auto">
         <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center text-gray-800">Match Fingerprints</h1>
         
         {% if role == "Forensic Expertise" %}
-        <form method="POST" enctype="multipart/form-data" class="mb-6 space-y-4">
+        <form method="POST" enctype="multipart/form-data" class="mb-6 space-y-4" onsubmit="showSpinner()">
             <div>
                 <label class="block text-gray-700 font-medium mb-2">Search User by ID:</label>
                 <input type="text" name="user_id" 
@@ -34,10 +39,12 @@
                 <p><strong>Gender:</strong> {{ user_data.gender }}</p>
                 <p><strong>Contact Info:</strong> {{ user_data.contact_info }}</p>
                 <p><strong>Blood Type:</strong> {{ user_data.blood_type }}</p>
+                <p><strong>Fingerprint Capture Date:</strong> {{ user_data.fingerprint_capture_date }}</p>
+
             </div>
         </div>
 
-        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form method="POST" enctype="multipart/form-data" class="space-y-6" onsubmit="showSpinner()">
             <input type="hidden" name="fingerprint1_id" value="{{ user_data._id }}">
             
             <div>
@@ -99,6 +106,14 @@
            class="inline-block bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors mt-6 w-full text-center">
             Back to Main Page
         </a>
+    </div>
+
+    <!-- Spinner -->
+    <div id="spinner" class="hidden fixed top-0 left-0 w-full h-full bg-slate-200 bg-opacity-30 flex items-center justify-center">
+        <svg class="animate-spin h-12 w-12 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
     </div>
 </body>
 </html>

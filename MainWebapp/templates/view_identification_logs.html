@@ -19,6 +19,7 @@
                         <tr>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 rounded-tl-lg">Log ID</th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Timestamp</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Uploaded Filename</th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 rounded-tr-lg">Actions</th>
                         </tr>
                     </thead>
@@ -27,6 +28,7 @@
                         <tr class="{% if loop.index is even %}bg-gray-50{% else %}bg-white{% endif %} hover:bg-gray-100">
                             <td class="px-4 py-3 text-sm text-gray-600">{{ log._id }}</td>
                             <td class="px-4 py-3 text-sm text-gray-600">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-600">{{ log.uploaded_fingerprint_filename }}</td>
                             <td class="px-4 py-3">
                                 <div class="flex items-center gap-2">
                                     {% if log.status == "processing" %}
@@ -64,6 +66,9 @@
                         </p>
                         <p class="text-sm font-medium text-gray-700">Timestamp: 
                             <span class="font-normal text-gray-600">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                        </p>
+                        <p class="text-sm font-medium text-gray-700">Uploaded Filename: 
+                            <span class="font-normal text-gray-600">{{ log.uploaded_fingerprint_filename }}</span>
                         </p>
                     </div>
                     <div class="space-y-2">

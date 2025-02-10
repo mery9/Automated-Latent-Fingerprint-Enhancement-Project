@@ -505,6 +505,7 @@ def identify_fingerprints():
             log_id = identification_results_collection.insert_one({
                 "user": session["username"],
                 "uploaded_fingerprint": file_id,
+                "uploaded_fingerprint_filename": filename,
                 "results": [],
                 "status": "processing",
                 "timestamp": datetime.datetime.now()

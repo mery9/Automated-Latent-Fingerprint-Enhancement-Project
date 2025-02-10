@@ -429,12 +429,12 @@ def download_enhanced_image(file_id):
         return str(e)
 
 # Function to process identification in the background
-def process_identification(log_id, uploaded_fingerprint_id, username):
+def process_identification(log_id, uploaded_fingerprint_id, username, upload_folder):
     enrollments = list(enrollments_collection.find({"approved": True}))
     results = []
 
     try:
-        uploaded_fingerprint_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{uploaded_fingerprint_id}.jpg")
+        uploaded_fingerprint_path = os.path.join(upload_folder, f"{uploaded_fingerprint_id}.jpg")
         with open(uploaded_fingerprint_path, "wb") as f:
             f.write(fs.get(uploaded_fingerprint_id).read())
 
@@ -443,7 +443,7 @@ def process_identification(log_id, uploaded_fingerprint_id, username):
             for fingerprint_type in ["right_thumb", "right_index", "right_middle", "right_ring", "right_little",
                                      "left_thumb", "left_index", "left_middle", "left_ring", "left_little"]:
                 if f"fingerprints_{fingerprint_type}" in enrollment:
-                    fingerprint2_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{enrollment['_id']}_{fingerprint_type}.jpg")
+                    fingerprint2_path = os.path.join(upload_folder, f"{enrollment['_id']}_{fingerprint_type}.jpg")
 
                     with open(fingerprint2_path, "wb") as f2:
                         f2.write(fs.get(enrollment[f"fingerprints_{fingerprint_type}"]).read())
@@ -488,6 +488,8 @@ def process_identification(log_id, uploaded_fingerprint_id, username):
     finally:
         if os.path.exists(uploaded_fingerprint_path):
             os.remove(uploaded_fingerprint_path)
+        if os.path.exists(upload_folder):
+            shutil.rmtree(upload_folder)
 
 # Route: Identify Fingerprints
 @app.route("/identify_fingerprints", methods=["GET", "POST"])
@@ -496,25 +498,36 @@ def identify_fingerprints():
         return redirect(url_for("login"))
 
     if request.method == "POST":
-        if "fingerprint_photo" in request.files:
-            fingerprint_photo = request.files["fingerprint_photo"]
-            filename = secure_filename(fingerprint_photo.filename)
-            file_id = fs.put(fingerprint_photo, filename=filename)
+        if "fingerprint_photos" in request.files:
+            files = request.files.getlist("fingerprint_photos")
+            for file in files:
+                filename = secure_filename(file.filename)
+                file_id = fs.put(file, filename=filename)
 
-            # Create a log entry with "processing" status
-            log_id = identification_results_collection.insert_one({
-                "user": session["username"],
-                "uploaded_fingerprint": file_id,
-                "uploaded_fingerprint_filename": filename,
-                "results": [],
-                "status": "processing",
-                "timestamp": datetime.datetime.now()
-            }).inserted_id
+                # Create a unique folder for each file
+                unique_id = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
+                upload_folder = os.path.join(app.config['UPLOAD_FOLDER'], f'identify_input_{unique_id}')
+                os.makedirs(upload_folder, exist_ok=True)
 
-            # Start the background process
-            threading.Thread(target=process_identification, args=(log_id, file_id, session["username"])).start()
-            log_action(session["username"], f"Started identification process for log {log_id}")
-            return render_template("success.html", message="Identification process started. You can check the results in the log.", back_url=url_for("identify_fingerprints"))
+                file_path = os.path.join(upload_folder, filename)
+                with open(file_path, "wb") as f:
+                    f.write(fs.get(file_id).read())
+
+                # Create a log entry with "processing" status
+                log_id = identification_results_collection.insert_one({
+                    "user": session["username"],
+                    "uploaded_fingerprint": file_id,
+                    "uploaded_fingerprint_filename": filename,
+                    "results": [],
+                    "status": "processing",
+                    "timestamp": datetime.datetime.now()
+                }).inserted_id
+
+                # Start the background process for each file
+                threading.Thread(target=process_identification, args=(log_id, file_id, session["username"], upload_folder)).start()
+                log_action(session["username"], f"Started identification process for log {log_id}")
+
+            return render_template("success.html", message="Identification processes started. You can check the results in the logs.", back_url=url_for("identify_fingerprints"))
 
     log_action(session["username"], "Accessed identify fingerprints page")
     return render_template("identify_fingerprints.html", role=session["role"])

@@ -18,14 +18,14 @@
         {% if role == "Forensic Expertise" %}
         <form method="POST" enctype="multipart/form-data" class="space-y-4" onsubmit="showSpinner()">
             <div>
-                <label class="block text-gray-700 font-medium mb-2">Upload Fingerprint Photo:</label>
-                <input type="file" name="fingerprint_photo" 
+                <label class="block text-gray-700 font-medium mb-2">Upload Fingerprint Photos:</label>
+                <input type="file" name="fingerprint_photos" multiple
                        class="w-full p-2 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 focus:ring-2 focus:ring-blue-500"
                        required>
             </div>
             <button type="submit" 
                     class="w-full bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">
-                Identify Fingerprint
+                Identify Fingerprints
             </button>
         </form>
 

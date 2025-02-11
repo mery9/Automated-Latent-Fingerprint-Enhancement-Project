@@ -31,6 +31,7 @@ This project is a web application for managing fingerprint enrollments, matching
 
 2. Create a virtual environment and activate it:
    ```bash
+   sudo apt install python3.10-venv
    python -m venv venv
    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
    ```

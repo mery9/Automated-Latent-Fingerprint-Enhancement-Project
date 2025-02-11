@@ -30,9 +30,9 @@ class TestNetwork(object):
 
     def _init_configure(self):
         parser = argparse.ArgumentParser(description='Process the command line.')
-        parser.add_argument('--latent_fingerprint_dir', type=str, default=r'..\LatentEnhancement\Dataset\SD27_latent_TV_texture')
+        parser.add_argument('--latent_fingerprint_dir', type=str, default=r'..\LatentsEnhancement\Dataset\SD27_latent_TV_texture')
         parser.add_argument('--out_dir', type=str, default='..\enhancement_results')
-        parser.add_argument('--resume_path', type=str, default=r'..\WebApp\MainWebapp\LatentEnhancement\trained_model\FingerGAN_25850831.tar')
+        parser.add_argument('--resume_path', type=str, default=r'..\WebApp\MainWebapp\LatentsEnhancement\trained_model\FingerGAN_25850831.tar')
         parser.add_argument('--step', type=int, default=10) # the step for sliding windows. The smaller, the better the enhancement accuracy, but the more the running time
         parser.add_argument('--en_batch_size', type=int, default=48) # batch size to enhance a latent. A large value can speed up the computation. 
         parser.add_argument('--gpu_num', type=int, default=1)

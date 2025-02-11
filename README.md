@@ -1,44 +1,44 @@
-# Latent Fingerprint Web Application
+# WebApp Project
 
-This project is a web application for managing latent fingerprints, user enrollments, and fingerprint matching. It is built using Flask for the backend, tailwaind for the frontend css, and MongoDB for the database.
+## Overview
 
-## Table of Contents
+This project is a web application for managing fingerprint enrollments, matching fingerprints, and enhancing latent fingerprints. It includes features for user registration, login, and role-based access control.
 
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Running the Application](#running-the-application)
-- [Project Structure](#project-structure)
-- [Usage](#usage)
-- [License](#license)
+## Features
 
-## Prerequisites
+- User Registration and Login
+- Role-based Access Control (Citizen, Police and Investigator, Forensic Expertise, Government Official)
+- Fingerprint Enrollment
+- Fingerprint Matching
+- Latent Fingerprint Enhancement
+- System Logs
 
-Before you begin, ensure you have the following installed on your system:
+## Setup
 
-- Python 3.10.6 (higher version may bugged)
-- Java 11
+### Prerequisites
+
+- Python 3.x
 - MongoDB
 - Maven
 - Nvidia CUDA 
 
 ## Installation
 
-1. **Clone the repository**:
-   ```sh
-   git clone https://github.com/yourusername/latent-fingerprint-webapp.git
-   cd latent-fingerprint-webapp
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/mery9/Automated-Latent-Fingerprint-Enhancement-Project.git
    ```
 
-2. **Set up the Python environment**:
-   ```sh
+2. Create a virtual environment and activate it:
+   ```bash
    python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
    ```
 
 3. **Install Python dependencies**:
    ```sh
    pip install -r requirements.txt
+   pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu118
    ```
 
 4. **Set up the Java environment**:

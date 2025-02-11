@@ -6,3 +6,6 @@
 /.env
 /.gradio
 /flask-example
+
+# Ignore the FingerGAN_25850831.tar file
+MainWebapp/LatentsEnhancement/trained_model/FingerGAN_25850831.tar

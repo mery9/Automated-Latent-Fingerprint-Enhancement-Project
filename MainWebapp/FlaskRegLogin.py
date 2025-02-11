@@ -9,7 +9,7 @@ import datetime
 import subprocess
 import threading
 import shutil
-from LatentEnhancement.experiment.latent_fingerprint_enhancement import TestNetwork
+from LatentsEnhancement.experiment.latent_fingerprint_enhancement import TestNetwork
 
 # Load environment variables
 load_dotenv()

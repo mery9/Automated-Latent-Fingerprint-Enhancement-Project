@@ -129,12 +129,12 @@ def enrollment():
 
     if request.method == "POST":
         data = request.form
-        firstname = data.get("firstname")
-        lastname = data.get("lastname")
-        gender = data.get("gender")
-        contact_info = data.get("contact_info")
-        blood_type = data.get("blood_type")
-        user_id = session["user_id"] if session["role"] == "Citizen" else data.get("user_id")
+        firstname = data.get("firstname").strip()
+        lastname = data.get("lastname").strip()
+        gender = data.get("gender").strip()
+        contact_info = data.get("contact_info").strip()
+        blood_type = data.get("blood_type").strip()
+        user_id = session["user_id"] if session["role"] == "Citizen" else data.get("user_id").strip()
         
         # Check if the user already has enrollment data
         if session["role"] == "Citizen" and enrollments_collection.find_one({"user_id": user_id}):

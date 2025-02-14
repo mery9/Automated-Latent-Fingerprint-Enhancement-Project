@@ -628,17 +628,39 @@ def manage_users():
             {"approved": {"$regex": search_query, "$options": "i"}}
         ]
 
-    if request.method == "POST" and "user_id" in request.form:
-        user_id = request.form.get("user_id")
-        new_role = request.form.get("new_role")
-        new_approval_status = request.form.get("new_approval_status") == "true"
+    if request.method == "POST":
+        if "user_id" in request.form:
+            user_id = request.form.get("user_id")
+            new_role = request.form.get("new_role")
+            new_approval_status = request.form.get("new_approval_status") == "true"
 
-        users_collection.update_one({"_id": ObjectId(user_id)}, {"$set": {"role": new_role, "approved": new_approval_status}})
-        log_action(session["username"], f"Updated user {user_id} role to {new_role} and approval status to {new_approval_status}")
+            users_collection.update_one({"_id": ObjectId(user_id)}, {"$set": {"role": new_role, "approved": new_approval_status}})
+            log_action(session["username"], f"Updated user {user_id} role to {new_role} and approval status to {new_approval_status}")
+        
+        if "delete_user_id" in request.form:
+            delete_user_id = request.form.get("delete_user_id")
+            delete_user_data(delete_user_id)
+            log_action(session["username"], f"Deleted user {delete_user_id}")
 
     users = list(users_collection.find(query))
     log_action(session["username"], "Viewed and managed users")
     return render_template("manage_users.html", users=users, search_query=search_query)
+
+def delete_user_data(user_id):
+    # Delete user from users collection
+    users_collection.delete_one({"_id": ObjectId(user_id)})
+    
+    # Delete user's enrollments
+    enrollments_collection.delete_many({"user_id": user_id})
+    
+    # Delete user's logs
+    logs_collection.delete_many({"user": user_id})
+    
+    # Delete user's identification results
+    identification_results_collection.delete_many({"user": user_id})
+    
+    # Delete user's enhanced images
+    enhanced_images_collection.delete_many({"user": user_id})
 
 # Route: View Logs
 @app.route("/view_logs", methods=["GET", "POST"])

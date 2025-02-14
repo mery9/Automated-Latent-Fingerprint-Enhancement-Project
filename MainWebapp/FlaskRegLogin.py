@@ -134,7 +134,9 @@ def enrollment():
         gender = data.get("gender").strip()
         contact_info = data.get("contact_info").strip()
         blood_type = data.get("blood_type").strip()
+        fingerprint_capture_date = data.get("fingerprint_capture_date").strip()
         user_id = session["user_id"] if session["role"] == "Citizen" else data.get("user_id").strip()
+        username = session["username"]
         
         # Check if the user already has enrollment data
         if session["role"] == "Citizen" and enrollments_collection.find_one({"user_id": user_id}):
@@ -164,11 +166,13 @@ def enrollment():
 
         enrollment_data = {
             "user_id": user_id,
+            "username": username,
             "firstname": firstname,
             "lastname": lastname,
             "gender": gender,
             "contact_info": contact_info,
             "blood_type": blood_type,
+            "fingerprint_capture_date": fingerprint_capture_date,
             **fingerprints,
             "approved": False if session["role"] == "Citizen" else True
         }

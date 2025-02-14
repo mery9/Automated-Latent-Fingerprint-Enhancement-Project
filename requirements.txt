@@ -15,3 +15,4 @@ opencv-python >= 4.5.3.56
 scipy >= 1.6.0
 mat73
 tensorboard
+flatpickr==4.6.9

@@ -50,6 +50,10 @@ def save_photo(user_id, finger_type, photo):
     file_id = fs.put(photo, filename=filename)
     return file_id
 
+# Function to calculate shard number
+def calculate_shard_number(user_id, num_shards=4):
+    return int(user_id, 16) % num_shards
+
 # Route: Home
 
 @app.route("/test")
@@ -142,6 +146,9 @@ def enrollment():
         if session["role"] == "Citizen" and enrollments_collection.find_one({"user_id": user_id}):
             return render_template("error.html", message="You have already enrolled.", back_url=url_for("main_page"))
 
+        # Calculate shard number
+        shard_number = calculate_shard_number(user_id)
+
         fingerprints = {}
         if "fingerprints_right_thumb" in request.files:
             fingerprints["fingerprints_right_thumb"] = save_photo(user_id, "Right_Thumb", request.files["fingerprints_right_thumb"])
@@ -173,6 +180,7 @@ def enrollment():
             "contact_info": contact_info,
             "blood_type": blood_type,
             "fingerprint_capture_date": fingerprint_capture_date,
+            "shard_number": shard_number,
             **fingerprints,
             "approved": False if session["role"] == "Citizen" else True
         }
@@ -236,8 +244,21 @@ def view_approved_enrollments():
     if "username" not in session or session["role"] != "Police and Investigator":
         return redirect(url_for("login"))
 
-    enrollments = enrollments_collection.find({"approved": True})
-    log_action(session["username"], "Viewed approved enrollments")
+    sort_by = request.args.get("sort_by", "firstname")
+    filter_gender = request.args.get("filter_gender", "")
+    filter_blood_type = request.args.get("filter_blood_type", "")
+    search_shard = request.args.get("search_shard", "")
+
+    query = {"approved": True}
+    if filter_gender:
+        query["gender"] = filter_gender
+    if filter_blood_type:
+        query["blood_type"] = filter_blood_type
+    if search_shard:
+        query["shard_number"] = int(search_shard)
+
+    enrollments = enrollments_collection.find(query).sort(sort_by)
+    log_action(session["username"], "Viewed approved enrollments with sorting and filtering")
     return render_template("view_approved_enrollments.html", enrollments=enrollments)
 
 # Route: Enhance Latent Fingerprint

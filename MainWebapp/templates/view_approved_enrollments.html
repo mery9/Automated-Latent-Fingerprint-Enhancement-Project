@@ -6,41 +6,123 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
-<body class="bg-gray-100 p-4 md:p-8">
-  <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
-    <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-6">
+<body class="bg-gray-50 p-4 md:p-8">
+  <div class="max-w-6xl mx-auto bg-white p-6 rounded-xl shadow-sm">
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8 text-center">
       Approved Enrollments
     </h1>
     
-    <!-- Responsive Enrollment Cards Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {% for enrollment in enrollments %}
-      <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
-        <div>
-          <p class="text-lg font-semibold text-gray-800">
-            {{ enrollment.firstname }} {{ enrollment.lastname }}
-          </p>
-          <p class="text-gray-600 text-sm">
-            User ID: {{ enrollment.user_id }}
-          </p>
+    <!-- Enhanced Filter/Sort Section -->
+    <form method="GET" action="{{ url_for('view_approved_enrollments') }}" class="mb-8">
+      <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <!-- Sort By -->
+          <div class="space-y-1">
+            <label class="text-sm font-medium text-gray-600">Sort By</label>
+            <select name="sort_by" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all">
+              <option value="firstname">First Name</option>
+              <option value="lastname">Last Name</option>
+              <option value="gender">Gender</option>
+              <option value="blood_type">Blood Type</option>
+              <option value="fingerprint_capture_date">Enrollment Date</option>
+              <option value="shard_number">Shard Number</option>
+            </select>
+          </div>
+
+          <!-- Gender Filter -->
+          <div class="space-y-1">
+            <label class="text-sm font-medium text-gray-600">Gender</label>
+            <select name="filter_gender" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500">
+              <option value="">All Genders</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+
+          <!-- Blood Type Filter -->
+          <div class="space-y-1">
+            <label class="text-sm font-medium text-gray-600">Blood Type</label>
+            <select name="filter_blood_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500">
+              <option value="">All Blood Types</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="AB">AB</option>
+              <option value="O">O</option>
+            </select>
+          </div>
+
+          <!-- Shard Search -->
+          <div class="space-y-1">
+            <label class="text-sm font-medium text-gray-600">Shard Search</label>
+            <input type="text" name="search_shard" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500" 
+                   placeholder="Enter shard number">
+          </div>
         </div>
-        <div class="mt-3">
+        
+        <!-- Apply Button -->
+        <div class="mt-4 flex justify-end">
+          <button type="submit" 
+                  class="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all">
+            Apply Filters
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Enhanced Enrollment Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {% for enrollment in enrollments %}
+      <div class="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-shadow">
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-gray-800">
+              {{ enrollment.firstname }} {{ enrollment.lastname }}
+            </h3>
+            <span class="text-sm text-gray-500">#{{ loop.index }}</span>
+          </div>
+          
+          <div class="space-y-1.5">
+            <div class="flex items-center text-sm">
+              <span class="w-24 text-gray-500">User ID :</span>
+              <span class="text-gray-700 font-medium">{{ enrollment.user_id }}</span>
+            </div>
+            <div class="flex items-center text-sm">
+              <span class="w-24 text-gray-500">Shard :</span>
+              <span class="text-gray-700 font-medium">{{ enrollment.shard_number }}</span>
+            </div>
+            <div class="flex items-center text-sm">
+              <span class="w-24 text-gray-500">Gender :</span>
+              <span class="text-gray-700">{{ enrollment.gender }}</span>
+            </div>
+            <div class="flex items-center text-sm">
+              <span class="w-24 text-gray-500">Blood Type :</span>
+              <span class="text-gray-700">{{ enrollment.blood_type }}</span>
+            </div>
+            <div class="flex items-center text-sm">
+              <span class="w-24 text-gray-500">Enrolled :</span>
+              <span class="text-gray-700">{{ enrollment.fingerprint_capture_date }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- View Details Button -->
+        <div class="mt-4">
           <a href="{{ url_for('view_enrollment', user_id=enrollment.user_id) }}" 
-             class="block text-center bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded">
-            View Details
+             class="block w-full text-center px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium rounded-lg transition-colors">
+            View Details →
           </a>
         </div>
       </div>
       {% endfor %}
     </div>
-    
-    <!-- Back to Main Page Button -->
-    <div class="mt-6 text-center">
+
+    <!-- Enhanced Back Button -->
+    <div class="mt-8 flex justify-center">
       <a href="{{ url_for('main_page') }}" 
-         class="inline-flex items-center text-blue-500 hover:text-blue-600 text-sm font-medium">
-        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+         class="flex items-center px-5 py-2.5 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
         Back to Main Page
       </a>

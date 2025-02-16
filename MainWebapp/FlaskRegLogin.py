@@ -225,15 +225,15 @@ def view_enrollment(user_id):
             fingerprint_type = key.replace("fingerprints_", "")
             fingerprint_image_urls[fingerprint_type] = url_for('serve_image', file_id=enrollment[key])
 
-    if request.method == "POST" and not enrollment["approved"]:
+    if request.method == "POST":
         if "approve" in request.form:
             enrollments_collection.update_one({"user_id": user_id}, {"$set": {"approved": True}})
             log_action(session["username"], f"Approved enrollment for user {user_id}")
-            return render_template("success.html", message="Enrollment approved.", back_url=url_for("view_approved_enrollments"))
+            return render_template("success.html", message="Enrollment approved.", back_url=url_for("check_enrollment"))
         elif "disapprove" in request.form:
-            enrollments_collection.update_one({"user_id": user_id}, {"$set": {"approved": False}})
-            log_action(session["username"], f"Disapproved enrollment for user {user_id}")
-            return render_template("success.html", message="Enrollment disapproved.", back_url=url_for("view_approved_enrollments"))
+            enrollments_collection.delete_one({"user_id": user_id})
+            log_action(session["username"], f"Disapproved and deleted enrollment for user {user_id}")
+            return render_template("success.html", message="Enrollment disapproved and deleted.", back_url=url_for("check_enrollment"))
 
     log_action(session["username"], f"Viewed enrollment details for user {user_id}")
     return render_template("view_enrollment.html", enrollment=enrollment, fingerprint_image_urls=fingerprint_image_urls)
@@ -248,6 +248,9 @@ def view_approved_enrollments():
     filter_gender = request.args.get("filter_gender", "")
     filter_blood_type = request.args.get("filter_blood_type", "")
     search_shard = request.args.get("search_shard", "")
+    search_firstname = request.args.get("search_firstname", "")
+    search_lastname = request.args.get("search_lastname", "")
+    error_message = None
 
     query = {"approved": True}
     if filter_gender:
@@ -255,11 +258,34 @@ def view_approved_enrollments():
     if filter_blood_type:
         query["blood_type"] = filter_blood_type
     if search_shard:
-        query["shard_number"] = int(search_shard)
+        try:
+            query["shard_number"] = int(search_shard)
+        except ValueError:
+            error_message = "Shard number must be an integer."
+    if search_firstname:
+        if not search_firstname.isalpha():
+            error_message = "Firstname must contain only letters."
+        else:
+            query["firstname"] = {"$regex": search_firstname, "$options": "i"}
+    if search_lastname:
+        if not search_lastname.isalpha():
+            error_message = "Lastname must contain only letters."
+        else:
+            query["lastname"] = {"$regex": search_lastname, "$options": "i"}
 
-    enrollments = enrollments_collection.find(query).sort(sort_by)
+    enrollments = enrollments_collection.find(query)
+    
+    if sort_by == "blood_type":
+        blood_type_order = {"A": 1, "B": 2, "O": 3, "AB": 4}
+        enrollments = sorted(enrollments, key=lambda x: blood_type_order.get(x["blood_type"], 5))
+    elif sort_by == "gender":
+        gender_order = {"Male": 1, "Female": 2}
+        enrollments = sorted(enrollments, key=lambda x: gender_order.get(x["gender"], 3))
+    else:
+        enrollments = enrollments.sort(sort_by)
+
     log_action(session["username"], "Viewed approved enrollments with sorting and filtering")
-    return render_template("view_approved_enrollments.html", enrollments=enrollments)
+    return render_template("view_approved_enrollments.html", enrollments=enrollments, error_message=error_message)
 
 # Route: Enhance Latent Fingerprint
 @app.route("/enhance_latent_fingerprint/<fingerprint_id>", methods=["GET", "POST"])

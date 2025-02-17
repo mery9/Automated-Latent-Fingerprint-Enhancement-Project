@@ -38,9 +38,11 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Utility function for logging
 def log_action(user, action):
+    ip_address = request.remote_addr
     logs_collection.insert_one({
         "user": user,
         "action": action,
+        "ip_address": ip_address,
         "timestamp": datetime.datetime.now()
     })
 
@@ -728,7 +730,8 @@ def view_logs():
                 "$or": [
                     {"user": {"$regex": search_query, "$options": "i"}},
                     {"action": {"$regex": search_query, "$options": "i"}},
-                    {"timestamp": {"$regex": search_query, "$options": "i"}}
+                    {"timestamp": {"$regex": search_query, "$options": "i"}},
+                    {"ip_address": {"$regex": search_query, "$options": "i"}}
                 ]
             }
     

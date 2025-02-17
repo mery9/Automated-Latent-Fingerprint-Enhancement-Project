@@ -32,6 +32,7 @@
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Log ID</th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">User</th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Action</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">IP Address</th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Timestamp</th>
                         </tr>
                     </thead>
@@ -41,6 +42,7 @@
                             <td class="px-4 py-3 text-sm text-gray-600">{{ log._id }}</td>
                             <td class="px-4 py-3 text-sm text-gray-600">{{ log.user }}</td>
                             <td class="px-4 py-3 text-sm text-gray-600">{{ log.action }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-600">{{ log.ip_address }}</td>
                             <td class="px-4 py-3 text-sm text-gray-600">{{ log.timestamp }}</td>
                         </tr>
                         {% endfor %}
@@ -56,6 +58,7 @@
                         <p class="col-span-2 font-medium text-gray-700">Log ID: {{ log._id }}</p>
                         <p><span class="text-gray-600">User:</span> {{ log.user }}</p>
                         <p><span class="text-gray-600">Action:</span> {{ log.action }}</p>
+                        <p><span class="text-gray-600">IP Address:</span> {{ log.ip_address }}</p>
                         <p class="col-span-2 text-gray-600">Timestamp: {{ log.timestamp }}</p>
                     </div>
                 </div>

@@ -19,6 +19,7 @@ This project is a web application for managing fingerprint enrollments, matching
 
 - Python 3.x
 - MongoDB
+- Java 11
 - Maven
 - Nvidia CUDA 
 

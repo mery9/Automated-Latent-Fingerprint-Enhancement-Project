@@ -5,6 +5,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            background-color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+        }
+        .card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        .btn {
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .footer {
+            background-color: #e5e7eb;
+        }
+    </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
     <div class="flex-grow p-4 md:p-8">
@@ -15,7 +37,7 @@
             </h1>
 
             <!-- User Info Card -->
-            <div class="bg-white border border-gray-200 rounded-xl p-4 mb-8 shadow-sm">
+            <div class="bg-white border border-gray-200 rounded-xl p-4 mb-8 shadow-sm card">
                 <div class="bg-gray-50 px-4 py-3 border-b border-gray-100 rounded-t-lg">
                     <h2 class="text-lg font-semibold text-gray-700">User Information</h2>
                 </div>
@@ -30,51 +52,51 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {% if role in ["Citizen", "Police and Investigator"] %}
                     <a href="{{ url_for('enrollment') }}" 
-                       class="bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 transition-colors text-center">
+                       class="bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 transition-colors text-center btn">
                         Enrollment Page
                     </a>
                 {% endif %}
 
                 {% if role == "Police and Investigator" %}
                     <a href="{{ url_for('check_enrollment') }}" 
-                       class="bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 transition-colors text-center">
+                       class="bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 transition-colors text-center btn">
                         Check Enrollment Integrity
                     </a>
                     <a href="{{ url_for('view_approved_enrollments') }}" 
-                       class="bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 transition-colors text-center">
+                       class="bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 transition-colors text-center btn">
                         View Enrollment Data
                     </a>
                 {% endif %}
 
                 {% if role == "Forensic Expertise" %}
                     <a href="{{ url_for('match_fingerprints') }}" 
-                       class="bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 transition-colors text-center">
+                       class="bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 transition-colors text-center btn">
                         Fingerprint Verification
                     </a>
                     <a href="{{ url_for('identify_fingerprints') }}" 
-                       class="bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 transition-colors text-center">
+                       class="bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 transition-colors text-center btn">
                         Fingerprint Identification
                     </a>
                     <a href="{{ url_for('enhance_fingerprint') }}" 
-                       class="bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 transition-colors text-center">
+                       class="bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 transition-colors text-center btn">
                         Enhance Fingerprint
                     </a>
                 {% endif %}
 
                 {% if role == "Government Official" %}
                     <a href="{{ url_for('manage_users') }}" 
-                       class="bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 transition-colors text-center">
+                       class="bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 transition-colors text-center btn">
                         Manage Users
                     </a>
                     <a href="{{ url_for('view_logs') }}" 
-                       class="bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 transition-colors text-center">
+                       class="bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 transition-colors text-center btn">
                         View System Logs
                     </a>
                 {% endif %}
 
                 <!-- Logout Button -->
                 <a href="{{ url_for('logout') }}" 
-                   class="bg-red-500 text-white p-4 rounded-lg hover:bg-red-600 transition-colors text-center md:col-span-2 lg:col-span-3">
+                   class="bg-red-500 text-white p-4 rounded-lg hover:bg-red-600 transition-colors text-center md:col-span-2 lg:col-span-3 btn">
                     Logout
                 </a>
             </div>
@@ -82,7 +104,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-gray-200 mt-8 py-4 text-center">
+    <footer class="footer mt-8 py-4 text-center">
         <p class="text-gray-600 text-sm">
             &copy; 2024 Kantinan Boonyingsathit Thesis Project. All rights reserved.
         </p>

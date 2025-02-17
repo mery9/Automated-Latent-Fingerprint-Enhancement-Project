@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            background-color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        .container h1 {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        .container p {
+            font-size: 1.25rem;
+            color: #4b5563;
+            margin: 1rem 0;
+        }
+        .container a {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background-color: #3b82f6;
+            color: #ffffff;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: medium;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .container a:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>404</h1>
+        <p>Sorry, the page you are looking for cannot be found.</p>
+        <a href="{{ url_for('main_page') if session.get('username') else url_for('login') }}">Go Back Home</a>
+    </div>
+</body>
+</html>

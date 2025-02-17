@@ -668,34 +668,29 @@ def manage_users():
     if "username" not in session or session["role"] != "Government Official":
         return redirect(url_for("login"))
 
-    search_query = request.form.get("search", "").strip()
-
+    sort_by = request.args.get("sort_by", "username")
+    filter_role = request.args.get("filter_role", "")
+    filter_approved = request.args.get("filter_approved", "")
+    search_username = request.args.get("search_username", "")
+    
     query = {}
-    if search_query:
-        query["$or"] = [
-            {"_id": {"$regex": search_query, "$options": "i"}},
-            {"username": {"$regex": search_query, "$options": "i"}},
-            {"role": {"$regex": search_query, "$options": "i"}},
-            {"approved": {"$regex": search_query, "$options": "i"}}
-        ]
+    if filter_role:
+        query["role"] = filter_role
+    if filter_approved:
+        query["approved"] = filter_approved == "true"
+    if search_username:
+        query["username"] = {"$regex": search_username, "$options": "i"}
 
-    if request.method == "POST":
-        if "user_id" in request.form:
-            user_id = request.form.get("user_id")
-            new_role = request.form.get("new_role")
-            new_approval_status = request.form.get("new_approval_status") == "true"
+    users = users_collection.find(query)
+    
+    if sort_by == "role":
+        role_order = {"Government Official": 1, "Forensic Expertise": 2, "Police and Investigator": 3, "Citizen": 4}
+        users = sorted(users, key=lambda x: role_order.get(x["role"], 5))
+    else:
+        users = users.sort(sort_by)
 
-            users_collection.update_one({"_id": ObjectId(user_id)}, {"$set": {"role": new_role, "approved": new_approval_status}})
-            log_action(session["username"], f"Updated user {user_id} role to {new_role} and approval status to {new_approval_status}")
-        
-        if "delete_user_id" in request.form:
-            delete_user_id = request.form.get("delete_user_id")
-            delete_user_data(delete_user_id)
-            log_action(session["username"], f"Deleted user {delete_user_id}")
-
-    users = list(users_collection.find(query))
-    log_action(session["username"], "Viewed and managed users")
-    return render_template("manage_users.html", users=users, search_query=search_query)
+    log_action(session["username"], "Viewed and managed users with sorting and filtering")
+    return render_template("manage_users.html", users=users, sort_by=sort_by, filter_role=filter_role, filter_approved=filter_approved, search_username=search_username)
 
 def delete_user_data(user_id):
     # Delete user from users collection
@@ -769,6 +764,11 @@ def view_enhancement_result(log_id):
 
     log_action(session["username"], f"Viewed enhancement result for log {log_id}")
     return render_template("view_enhancement_result.html", log=log, enhanced_images=enhanced_images, role=session["role"])
+
+# Custom 404 Error Handler
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 # Route: Logout
 @app.route("/logout")

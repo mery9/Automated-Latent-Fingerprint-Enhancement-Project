@@ -56,6 +56,13 @@ def save_photo(user_id, finger_type, photo):
 def calculate_shard_number(user_id, num_shards=4):
     return int(user_id, 16) % num_shards
 
+# Function to get the next sequence number
+def get_next_sequence_number():
+    last_enrollment = enrollments_collection.find_one(sort=[("sequence_number", -1)])
+    if last_enrollment and "sequence_number" in last_enrollment:
+        return last_enrollment["sequence_number"] + 1
+    return 1
+
 # Route: Home
 
 @app.route("/test")
@@ -151,6 +158,9 @@ def enrollment():
         # Calculate shard number
         shard_number = calculate_shard_number(user_id)
 
+        # Get the next sequence number
+        sequence_number = get_next_sequence_number()
+
         fingerprints = {}
         if "fingerprints_right_thumb" in request.files:
             fingerprints["fingerprints_right_thumb"] = save_photo(user_id, "Right_Thumb", request.files["fingerprints_right_thumb"])
@@ -183,6 +193,7 @@ def enrollment():
             "blood_type": blood_type,
             "fingerprint_capture_date": fingerprint_capture_date,
             "shard_number": shard_number,
+            "sequence_number": sequence_number,
             **fingerprints,
             "approved": False if session["role"] == "Citizen" else True
         }
@@ -246,7 +257,7 @@ def view_approved_enrollments():
     if "username" not in session or session["role"] != "Police and Investigator":
         return redirect(url_for("login"))
 
-    sort_by = request.args.get("sort_by", "firstname")
+    sort_by = request.args.get("sort_by", "sequence_number")
     filter_gender = request.args.get("filter_gender", "")
     filter_blood_type = request.args.get("filter_blood_type", "")
     search_shard = request.args.get("search_shard", "")
@@ -283,6 +294,8 @@ def view_approved_enrollments():
     elif sort_by == "gender":
         gender_order = {"Male": 1, "Female": 2}
         enrollments = sorted(enrollments, key=lambda x: gender_order.get(x["gender"], 3))
+    elif sort_by == "sequence_number":
+        enrollments = enrollments.sort("sequence_number")
     else:
         enrollments = enrollments.sort(sort_by)
 

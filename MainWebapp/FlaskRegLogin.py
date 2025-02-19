@@ -10,6 +10,7 @@ import subprocess
 import threading
 import shutil
 from LatentsEnhancement.experiment.latent_fingerprint_enhancement import TestNetwork
+from PIL import Image
 
 # Load environment variables
 load_dotenv()
@@ -439,6 +440,18 @@ def process_enhancement(log_id, upload_folder, username, unique_id):
     results = []
 
     try:
+        # Resize and convert images to grayscale
+        for filename in os.listdir(upload_folder):
+            file_path = os.path.join(upload_folder, filename)
+            with Image.open(file_path) as img:
+                # Resize image dynamically
+                max_size = (1500, 1500)
+                img.thumbnail(max_size, Image.ANTIALIAS)
+                
+                # Convert to grayscale
+                grayscale_img = img.convert("L")
+                grayscale_img.save(file_path)
+
         # Run the enhancement tool
         test_network = TestNetwork()
         test_network.args.latent_fingerprint_dir = upload_folder

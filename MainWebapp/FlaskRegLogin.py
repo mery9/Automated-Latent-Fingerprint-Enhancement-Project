@@ -264,6 +264,7 @@ def view_approved_enrollments():
     search_shard = request.args.get("search_shard", "")
     search_firstname = request.args.get("search_firstname", "")
     search_lastname = request.args.get("search_lastname", "")
+    search_sequence_number = request.args.get("search_sequence_number", "")
     error_message = None
 
     query = {"approved": True}
@@ -286,6 +287,11 @@ def view_approved_enrollments():
             error_message = "Lastname must contain only letters."
         else:
             query["lastname"] = {"$regex": search_lastname, "$options": "i"}
+    if search_sequence_number:
+        try:
+            query["sequence_number"] = int(search_sequence_number)
+        except ValueError:
+            error_message = "Sequence number must be an integer."
 
     enrollments = enrollments_collection.find(query)
     

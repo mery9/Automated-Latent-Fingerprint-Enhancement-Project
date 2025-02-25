@@ -12,6 +12,8 @@ import shutil
 from LatentsEnhancement.experiment.latent_fingerprint_enhancement import TestNetwork
 from PIL import Image
 import signal
+import cv2
+import matplotlib.pyplot as plt
 
 # Load environment variables
 load_dotenv()
@@ -411,6 +413,28 @@ def match_fingerprints():
 enhancement_threads = {}
 enhancement_stop_events = {}
 
+def clahe_enhancement(image_path, debug=False):
+    """
+    Applies CLAHE enhancement to an image.
+
+    Args:
+        image_path (str): Path to the fingerprint image.
+        debug (bool): If True, display the original and enhanced images.
+
+    Returns:
+        np.ndarray: The CLAHE-enhanced image.
+    """
+    # Load the image in grayscale
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    if image is None:
+        raise ValueError("Image not found or unable to load.")
+
+    # Create a CLAHE object with a clip limit of 2.0 and a grid size of 8x8
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    clahe_enhanced = clahe.apply(image)
+
+    return clahe_enhanced
+
 @app.route("/enhance_fingerprint", methods=["GET", "POST"])
 def enhance_fingerprint():
     if "username" not in session or session["role"] != "Forensic Expertise":
@@ -418,6 +442,7 @@ def enhance_fingerprint():
 
     if request.method == "POST":
         enhancement_name = request.form.get("enhancement_name")
+        use_clahe = "use_clahe" in request.form
         if "fingerprint_photos" in request.files:
             files = request.files.getlist("fingerprint_photos")
             unique_id = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
@@ -444,7 +469,7 @@ def enhance_fingerprint():
             enhancement_stop_events[str(log_id)] = stop_event
 
             # Start the background process
-            thread = threading.Thread(target=process_enhancement, args=(log_id, upload_folder, session["username"], unique_id, stop_event))
+            thread = threading.Thread(target=process_enhancement, args=(log_id, upload_folder, session["username"], unique_id, stop_event, use_clahe))
             thread.start()
             # Store the thread reference in the global dictionary
             enhancement_threads[str(log_id)] = thread
@@ -454,7 +479,7 @@ def enhance_fingerprint():
     return render_template("enhance_fingerprint.html", role=session["role"])
 
 # Function to process enhancement in the background
-def process_enhancement(log_id, upload_folder, username, unique_id, stop_event):
+def process_enhancement(log_id, upload_folder, username, unique_id, stop_event, use_clahe):
     output_folder = os.path.join(app.config['UPLOAD_FOLDER'], f'enhance_output_{unique_id}')
     os.makedirs(output_folder, exist_ok=True)
     results = []
@@ -473,6 +498,15 @@ def process_enhancement(log_id, upload_folder, username, unique_id, stop_event):
                 # Convert to grayscale
                 grayscale_img = img.convert("L")
                 grayscale_img.save(file_path)
+
+        if use_clahe:
+            # Apply CLAHE enhancement
+            for filename in os.listdir(upload_folder):
+                if stop_event.is_set():
+                    break
+                file_path = os.path.join(upload_folder, filename)
+                enhanced_image = clahe_enhancement(file_path)
+                cv2.imwrite(file_path, enhanced_image)
 
         if not stop_event.is_set():
             # Run the enhancement tool

@@ -16,3 +16,4 @@ scipy >= 1.6.0
 mat73
 tensorboard
 flatpickr==4.6.9
+matplotlib

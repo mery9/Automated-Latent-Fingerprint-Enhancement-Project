@@ -11,6 +11,7 @@ import threading
 import shutil
 from LatentsEnhancement.experiment.latent_fingerprint_enhancement import TestNetwork
 from PIL import Image
+import signal
 
 # Load environment variables
 load_dotenv()
@@ -406,7 +407,10 @@ def match_fingerprints():
     log_action(session["username"], "Accessed match fingerprints page")
     return render_template("match_fingerprints.html", user_data=user_data, similarity_score=similarity_score, fingerprint_image_urls=fingerprint_image_urls, available_fingerprint_types=available_fingerprint_types, role=session["role"])
 
-# Route: Enhance Fingerprint
+# Global dictionary to keep track of enhancement threads and stop events
+enhancement_threads = {}
+enhancement_stop_events = {}
+
 @app.route("/enhance_fingerprint", methods=["GET", "POST"])
 def enhance_fingerprint():
     if "username" not in session or session["role"] != "Forensic Expertise":
@@ -435,14 +439,22 @@ def enhance_fingerprint():
                 "timestamp": datetime.datetime.now()
             }).inserted_id
 
+            # Create a stop event for the thread
+            stop_event = threading.Event()
+            enhancement_stop_events[str(log_id)] = stop_event
+
             # Start the background process
-            threading.Thread(target=process_enhancement, args=(log_id, upload_folder, session["username"], unique_id)).start()
+            thread = threading.Thread(target=process_enhancement, args=(log_id, upload_folder, session["username"], unique_id, stop_event))
+            thread.start()
+            # Store the thread reference in the global dictionary
+            enhancement_threads[str(log_id)] = thread
+
             return render_template("success.html", message="Enhancement process started. You can check the results in the enhancement logs.", back_url=url_for("view_enhancement_logs"))
 
     return render_template("enhance_fingerprint.html", role=session["role"])
 
 # Function to process enhancement in the background
-def process_enhancement(log_id, upload_folder, username, unique_id):
+def process_enhancement(log_id, upload_folder, username, unique_id, stop_event):
     output_folder = os.path.join(app.config['UPLOAD_FOLDER'], f'enhance_output_{unique_id}')
     os.makedirs(output_folder, exist_ok=True)
     results = []
@@ -450,6 +462,8 @@ def process_enhancement(log_id, upload_folder, username, unique_id):
     try:
         # Resize and convert images to grayscale
         for filename in os.listdir(upload_folder):
+            if stop_event.is_set():
+                break
             file_path = os.path.join(upload_folder, filename)
             with Image.open(file_path) as img:
                 # Resize image dynamically
@@ -460,25 +474,42 @@ def process_enhancement(log_id, upload_folder, username, unique_id):
                 grayscale_img = img.convert("L")
                 grayscale_img.save(file_path)
 
-        # Run the enhancement tool
-        test_network = TestNetwork()
-        test_network.args.latent_fingerprint_dir = upload_folder
-        test_network.args.out_dir = output_folder
-        test_network.run_test()
+        if not stop_event.is_set():
+            # Run the enhancement tool
+            test_network = TestNetwork()
+            test_network.args.latent_fingerprint_dir = upload_folder
+            test_network.args.out_dir = output_folder
 
-        # Collect enhanced images and save to database
-        for filename in os.listdir(upload_folder):
-            enhanced_file_path = os.path.join(output_folder, filename)
-            if os.path.exists(enhanced_file_path):
-                with open(enhanced_file_path, "rb") as f:
-                    file_id = fs.put(f, filename=filename)
-                    results.append(file_id)
+            # Run the enhancement tool in a separate thread to allow interruption
+            enhancement_thread = threading.Thread(target=test_network.run_test)
+            enhancement_thread.start()
 
-        # Update the log entry with the results
-        enhanced_images_collection.update_one(
-            {"_id": ObjectId(log_id)},
-            {"$set": {"results": results, "status": "completed"}}
-        )
+            # Periodically check for the stop event
+            while enhancement_thread.is_alive():
+                if stop_event.is_set():
+                    # If stop event is set, terminate the enhancement process
+                    # This is a placeholder for actual termination logic
+                    # You might need to implement a stop mechanism in the enhancement tool
+                    break
+                enhancement_thread.join(timeout=1)
+
+            if not stop_event.is_set():
+                # Collect enhanced images and save to database
+                for filename in os.listdir(upload_folder):
+                    if stop_event.is_set():
+                        break
+                    enhanced_file_path = os.path.join(output_folder, filename)
+                    if os.path.exists(enhanced_file_path):
+                        with open(enhanced_file_path, "rb") as f:
+                            file_id = fs.put(f, filename=filename)
+                            results.append(file_id)
+
+                if not stop_event.is_set():
+                    # Update the log entry with the results
+                    enhanced_images_collection.update_one(
+                        {"_id": ObjectId(log_id)},
+                        {"$set": {"results": results, "status": "completed"}}
+                    )
 
     finally:
         # Clean up input and output folders
@@ -486,6 +517,30 @@ def process_enhancement(log_id, upload_folder, username, unique_id):
             shutil.rmtree(upload_folder)
         if os.path.exists(output_folder):
             shutil.rmtree(output_folder)
+
+# Function to cancel enhancement process
+def cancel_enhancement_process(log_id):
+    log = enhanced_images_collection.find_one({"_id": ObjectId(log_id)})
+    if log and log["status"] == "processing":
+        # Retrieve the stop event and thread reference from the global dictionaries
+        stop_event = enhancement_stop_events.pop(str(log_id), None)
+        thread = enhancement_threads.pop(str(log_id), None)
+        if stop_event:
+            stop_event.set()
+        if thread:
+            thread.join()
+
+        # Clean up the data
+        upload_folder = os.path.join(app.config['UPLOAD_FOLDER'], f'enhance_input_{log_id}')
+        if os.path.exists(upload_folder):
+            shutil.rmtree(upload_folder)
+        output_folder = os.path.join(app.config['UPLOAD_FOLDER'], f'enhance_output_{log_id}')
+        if os.path.exists(output_folder):
+            shutil.rmtree(output_folder)
+
+        # Delete the log entry
+        enhanced_images_collection.delete_one({"_id": ObjectId(log_id)})
+        log_action(session["username"], f"Cancelled and deleted enhancement process for log {log_id}")
 
 # Route: View Enhancement Logs
 @app.route("/view_enhancement_logs", methods=["GET", "POST"])
@@ -496,7 +551,11 @@ def view_enhancement_logs():
     if request.method == "POST":
         log_id = request.form.get("log_id")
         if log_id:
-            enhanced_images_collection.delete_one({"_id": ObjectId(log_id)})
+            log = enhanced_images_collection.find_one({"_id": ObjectId(log_id)})
+            if log and log["status"] == "processing":
+                cancel_enhancement_process(log_id)
+            else:
+                enhanced_images_collection.delete_one({"_id": ObjectId(log_id)})
             log_action(session["username"], f"Deleted enhancement log {log_id}")
             return redirect(url_for("view_enhancement_logs"))
 

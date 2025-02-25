@@ -35,19 +35,26 @@
                                         <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full">
                                             Processing...
                                         </span>
+                                        <form method="POST" class="inline-block">
+                                            <input type="hidden" name="log_id" value="{{ log._id }}">
+                                            <button type="submit" 
+                                                    class="bg-red-500 text-white px-3 py-1.5 text-sm rounded-md hover:bg-red-600 transition-colors">
+                                                Cancel
+                                            </button>
+                                        </form>
                                     {% else %}
                                         <a href="{{ url_for('view_enhancement_result', log_id=log._id) }}" 
                                            class="bg-blue-500 text-white px-3 py-1.5 text-sm rounded-md hover:bg-blue-600 transition-colors">
                                             View Result
                                         </a>
+                                        <form method="POST" class="inline-block">
+                                            <input type="hidden" name="log_id" value="{{ log._id }}">
+                                            <button type="submit" 
+                                                    class="bg-red-500 text-white px-3 py-1.5 text-sm rounded-md hover:bg-red-600 transition-colors">
+                                                Delete
+                                            </button>
+                                        </form>
                                     {% endif %}
-                                    <form method="POST" class="inline-block">
-                                        <input type="hidden" name="log_id" value="{{ log._id }}">
-                                        <button type="submit" 
-                                                class="bg-red-500 text-white px-3 py-1.5 text-sm rounded-md hover:bg-red-600 transition-colors">
-                                            Delete
-                                        </button>
-                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -76,19 +83,26 @@
                             <span class="inline-block w-full px-3 py-2 bg-yellow-100 text-yellow-800 text-sm rounded-md text-center">
                                 Processing...
                             </span>
+                            <form method="POST">
+                                <input type="hidden" name="log_id" value="{{ log._id }}">
+                                <button type="submit" 
+                                        class="block w-full bg-red-500 text-white px-4 py-2 text-sm rounded-md hover:bg-red-600 transition-colors">
+                                    Cancel
+                                </button>
+                            </form>
                         {% else %}
                             <a href="{{ url_for('view_enhancement_result', log_id=log._id) }}" 
                                class="block w-full bg-blue-500 text-white px-4 py-2 text-sm rounded-md hover:bg-blue-600 transition-colors text-center">
                                 View Result
                             </a>
+                            <form method="POST">
+                                <input type="hidden" name="log_id" value="{{ log._id }}">
+                                <button type="submit" 
+                                        class="block w-full bg-red-500 text-white px-4 py-2 text-sm rounded-md hover:bg-red-600 transition-colors">
+                                    Delete Log
+                                </button>
+                            </form>
                         {% endif %}
-                        <form method="POST">
-                            <input type="hidden" name="log_id" value="{{ log._id }}">
-                            <button type="submit" 
-                                    class="block w-full bg-red-500 text-white px-4 py-2 text-sm rounded-md hover:bg-red-600 transition-colors">
-                                Delete Log
-                            </button>
-                        </form>
                     </div>
                 </div>
                 {% endfor %}

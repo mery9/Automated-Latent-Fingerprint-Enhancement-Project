@@ -413,6 +413,7 @@ def enhance_fingerprint():
         return redirect(url_for("login"))
 
     if request.method == "POST":
+        enhancement_name = request.form.get("enhancement_name")
         if "fingerprint_photos" in request.files:
             files = request.files.getlist("fingerprint_photos")
             unique_id = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
@@ -427,6 +428,7 @@ def enhance_fingerprint():
             # Create a log entry with "processing" status
             log_id = enhanced_images_collection.insert_one({
                 "user": session["username"],
+                "enhancement_name": enhancement_name,
                 "files": [file.filename for file in files],
                 "results": [],
                 "status": "processing",

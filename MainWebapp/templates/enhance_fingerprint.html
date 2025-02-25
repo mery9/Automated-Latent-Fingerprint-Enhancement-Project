@@ -12,6 +12,11 @@
         
         <form method="POST" enctype="multipart/form-data" class="space-y-4">
             <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Enhancement Name</label>
+                <input type="text" id="enhancement_name" name="enhancement_name" required 
+                       class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Upload Fingerprint Images</label>
                 <input type="file" name="fingerprint_photos" multiple required 
                        class="w-full p-2 border border-gray-300 rounded file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 focus:ring-2 focus:ring-blue-500">

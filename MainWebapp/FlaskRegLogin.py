@@ -14,6 +14,8 @@ from PIL import Image
 import signal
 import cv2
 import matplotlib.pyplot as plt
+import zipfile
+from io import BytesIO
 
 # Load environment variables
 load_dotenv()
@@ -607,6 +609,28 @@ def download_enhanced_image(file_id):
     except Exception as e:
         log_action(session["username"], f"Failed to download enhanced image {file_id}: {str(e)}")
         return str(e)
+
+@app.route("/download_all_enhanced_images/<log_id>")
+def download_all_enhanced_images(log_id):
+    log = enhanced_images_collection.find_one({"_id": ObjectId(log_id)})
+    if not log:
+        return render_template("error.html", message="Log not found.", back_url=url_for("view_enhancement_logs"))
+
+    results = log.get("results", [])
+    if not results:
+        return render_template("error.html", message="No enhanced images found.", back_url=url_for("view_enhancement_logs"))
+
+    # Create a ZIP file in memory
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w") as zip_file:
+        for file_id in results:
+            file = fs.get(file_id)
+            zip_file.writestr(file.filename, file.read())
+
+    zip_buffer.seek(0)
+
+    # Send the ZIP file as a response
+    return send_file(zip_buffer, mimetype="application/zip", as_attachment=True, download_name=f"enhanced_images_{log_id}.zip")
 
 # Function to process identification in the background
 def process_identification(log_id, uploaded_fingerprint_id, username, upload_folder):

@@ -59,6 +59,12 @@
                 {% endfor %}
             </div>
         </div>
+        <div class="mt-6 flex justify-center">
+            <a href="{{ url_for('download_all_enhanced_images', log_id=log._id) }}" 
+               class="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 transition-colors text-sm md:text-base">
+                Download All Images
+            </a>
+        </div>
         {% else %}
         <p class="text-red-500 text-center font-semibold">Access Denied. This page is only accessible to users with the Forensic Expertise role.</p>
         {% endif %}

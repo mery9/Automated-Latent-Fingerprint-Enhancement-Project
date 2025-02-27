@@ -447,6 +447,11 @@ def enhance_fingerprint():
         use_clahe = "use_clahe" in request.form
         if "fingerprint_photos" in request.files:
             files = request.files.getlist("fingerprint_photos")
+            allowed_extensions = {".png", ".jpg", ".jpeg"}
+            for file in files:
+                if not any(file.filename.lower().endswith(ext) for ext in allowed_extensions):
+                    return render_template("error.html", message="Only .png, .jpg, and .jpeg files are allowed.", back_url=url_for("enhance_fingerprint"))
+
             unique_id = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
             upload_folder = os.path.join(app.config['UPLOAD_FOLDER'], f'enhance_input_{unique_id}')
             os.makedirs(upload_folder, exist_ok=True)

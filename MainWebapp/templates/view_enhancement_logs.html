@@ -5,8 +5,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style>
+        .spinner-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #000;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+    <script>
+        function showSpinner() {
+            document.getElementById('spinner-overlay').style.display = 'flex';
+        }
+        window.addEventListener('pageshow', function() {
+            document.getElementById('spinner-overlay').style.display = 'none';
+        });
+    </script>
 </head>
 <body class="bg-gray-100 p-4 md:p-8 min-h-screen">
+    <div class="spinner-overlay" id="spinner-overlay">
+        <div class="spinner"></div>
+    </div>
     <div class="max-w-6xl bg-white p-4 md:p-6 rounded-lg shadow-lg mx-auto">
         <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center text-gray-800">Enhancement Logs</h1>
         
@@ -44,7 +80,8 @@
                                         </form>
                                     {% else %}
                                         <a href="{{ url_for('view_enhancement_result', log_id=log._id) }}" 
-                                           class="bg-blue-500 text-white px-3 py-1.5 text-sm rounded-md hover:bg-blue-600 transition-colors">
+                                           class="bg-blue-500 text-white px-3 py-1.5 text-sm rounded-md hover:bg-blue-600 transition-colors"
+                                           onclick="showSpinner()">
                                             View Result
                                         </a>
                                         <form method="POST" class="inline-block">
@@ -92,7 +129,8 @@
                             </form>
                         {% else %}
                             <a href="{{ url_for('view_enhancement_result', log_id=log._id) }}" 
-                               class="block w-full bg-blue-500 text-white px-4 py-2 text-sm rounded-md hover:bg-blue-600 transition-colors text-center">
+                               class="block w-full bg-blue-500 text-white px-4 py-2 text-sm rounded-md hover:bg-blue-600 transition-colors text-center"
+                               onclick="showSpinner()">
                                 View Result
                             </a>
                             <form method="POST">
@@ -120,6 +158,14 @@
                 Back to Enhance Fingerprint
             </a>
         </div>
+    </div>
+
+    <!-- Spinner -->
+    <div id="spinner" class="hidden fixed top-0 left-0 w-full h-full bg-opacity-10 flex items-center justify-center">
+        <svg class="animate-spin h-12 w-12 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
     </div>
 </body>
 </html>

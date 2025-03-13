@@ -499,8 +499,8 @@ def process_enhancement(log_id, upload_folder, username, unique_id, stop_event, 
             file_path = os.path.join(upload_folder, filename)
             with Image.open(file_path) as img:
                 # Resize image dynamically
-                max_size = (1500, 1500)
-                img.thumbnail(max_size, Image.ANTIALIAS)
+                # max_size = (1500, 1500)
+                # img.thumbnail(max_size, Image.LANCZOS)
                 
                 # Convert to grayscale
                 grayscale_img = img.convert("L")
